@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.js" integrity="sha512-T5Bneq9hePRO8JR0S/0lQ7gdW+ceLThvC80UjwkMRz+8q+4DARVZ4dqKoyENC7FcYresjfJ6ubaOgIE35irf4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.css" integrity="sha512-MKxcSu/LDtbIYHBNAWUQwfB3iVoG9xeMCm32QV5hZ/9lFaQZJVaXfz9aFa0IZExWzCpm7OWvp9zq9gVip/nLMg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style> /* set the CSS */
+
+body { font: 12px Arial;}
+
+.slider-container {
+    height:50px;
+    width: 200px;
+    padding: 20px;
+}
+.slider-input {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 3em;
+  border-radius: 4px;
+  border: 1px solid #D3D3D3;
+}
+.slider-input-max {
+  float: right;
+}
+
+.slider {
+  height: 10px;
+}
+
+/* rounded, smaller, slider: see https://refreshless.com/nouislider/examples/#section-styling*/
+.slider .noUi-handle::before,
+.slider .noUi-handle::after {
+    display: none;  /*remove the decorative vertical lines on the slider handles */
+}
+.slider .noUi-handle {
+  height: 18px;
+  width: 18px;
+  top: -5px;
+  right: -9px; /* half the width */
+  border-radius: 9px;
+}
+
+</style>
+
+
+<body>
+<div id="test"></div>
+</body>
+
+<script>
+console.log("START");
+function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal){
+  let parentDiv = document.getElementById(parentDivID);
+
+  // create a container for the slider:
+  let componentContainer = document.createElement("div");
+  componentContainer.setAttribute("class", "slider-container");
+  componentContainer.setAttribute("id", sliderName+"-container");
+  parentDiv.appendChild(componentContainer);
+
+  // create the slider's label:
+  let label =  document.createElement("p");
+  label.innerText = labelText;
+  componentContainer.appendChild(label);
+
+  // create the slider itself:
+  let slider =  document.createElement("div");
+  slider.setAttribute("id", sliderName+"-slider");
+  slider.setAttribute("class", "slider");
+  componentContainer.appendChild(slider);
+  noUiSlider.create(slider, {
+      start: [startMinVal, startMaxVal],
+      connect: true,
+      range: {
+          'min': minVal,
+          'max': maxVal
+      },
+      step: 1
+  });
+
+  // create the input box for the lower end of the range:
+  let minInput = document.createElement("input");
+  minInput.setAttribute("type", "text");
+  minInput.setAttribute("class", "slider-input-min");
+  minInput.classList.add("slider-input");
+  minInput.setAttribute("id", sliderName+"-input-min");
+  minInput.setAttribute("value", startMinVal);
+  componentContainer.appendChild(minInput);
+
+  // create the input box for the upper end of the range:
+  let maxInput = document.createElement("input");
+  maxInput.setAttribute("type", "text");
+  maxInput.setAttribute("class", "slider-input-max");
+  maxInput.classList.add("slider-input");
+  maxInput.setAttribute("id", sliderName+"-input-max");
+  maxInput.setAttribute("value", startMaxVal);
+  componentContainer.appendChild(maxInput);
+
+  // add event listeners so the slider updates the inputs and vice versa:
+  slider.noUiSlider.on('update', function (values) {
+    minInput.value = parseInt(values[0]);
+    maxInput.value = parseInt(values[1]);
+  });
+  minInput.addEventListener("change", function() {
+    slider.noUiSlider.set([minInput.value, null]);
+  }, false);
+  maxInput.addEventListener("change", function() {
+    slider.noUiSlider.set([null, maxInput.value]);
+  }, false);
+
+  return [minInput, slider, maxInput];
+}
+
+let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("test", "ch_match", "Number of characters matched in milestone:", 0, 2000, 50, 800);
+console.log(ch_match_minInput.value);
+
+/*var slider = document.getElementById('slider');
+noUiSlider.create(slider, {
+    start: [20, 80],
+    connect: true,
+    range: {
+        'min': 0,
+        'max': 100
+    }
+});*/
+console.log("DONE");
+
+</script>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!--
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous"
+/>-->
+
+
+<!-- noUiSlider, see  https://refreshless.com/nouislider -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.js" integrity="sha512-T5Bneq9hePRO8JR0S/0lQ7gdW+ceLThvC80UjwkMRz+8q+4DARVZ4dqKoyENC7FcYresjfJ6ubaOgIE35irf4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.css" integrity="sha512-MKxcSu/LDtbIYHBNAWUQwfB3iVoG9xeMCm32QV5hZ/9lFaQZJVaXfz9aFa0IZExWzCpm7OWvp9zq9gVip/nLMg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<!--Load components: -->
+<script src="js/dataPreparation.js"></script>
+<script src="js/sliderCreation.js"></script>
+
+
+<style> /* set the CSS */
+
+body { font: 12px Arial;}
+
+div.tooltip {
+    position: absolute;
+    //text-align: center;
+    //width: 500px;
+    //height: 100px;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: black;
+    color: grey;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+rect.overlay {
+	stroke: black;
+}
+
+rect.selection {
+	stroke: none;
+  fill: steelblue;
+  fill-opacity: 0.6;
+}
+
+
+/*SLIDER*/
+.slider-container {
+    height:50px;
+    width: 200px;
+    padding: 20px;
+}
+.slider-input {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 3em;
+  border-radius: 4px;
+  border: 1px solid #D3D3D3;
+}
+.slider-input-max {
+  float: right;
+}
+
+.slider {
+  height: 10px;
+}
+
+/* rounded, smaller, slider: see https://refreshless.com/nouislider/examples/#section-styling*/
+.slider .noUi-handle::before,
+.slider .noUi-handle::after {
+    display: none;  /*remove the decorative vertical lines on the slider handles */
+}
+.slider .noUi-handle {
+  height: 18px;
+  width: 18px;
+  top: -5px;
+  right: -9px; /* half the width */
+  border-radius: 9px;
+}
+</style>
+
+
+<!-- Load d3.js-->
+<script src="https://d3js.org/d3.v4.js"></script>
+<!--<script src="https://d3js.org/d3.v7.min.js"></script>-->
+
+<!-- Load d3 color scales -->
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+
+<!-- Create a div where the graph will take place -->
+<body>
+  <div id="myFilters"></div>
+  <div id="my_dataviz">
+    <div id="slider1-container" class="slider-container"></div>
+  </div>
+  <!--slider:  see https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+  // WORKS ONLY WITH D3 V3, not with D3 V4 !!!!
+  <div id="slider1" class="row align-items-center">
+    <div class="col-sm-2"><p id="slider1-value"></p></div>
+    <div class="col-sm"><div id="slider1-slider"></div></div>
+  </div>-->
+  <div id="eventhandle-div"></div> <!--https://observablehq.com/@sarah37/snapping-range-slider-with-d3-brush-->
+</body>
+
+<script>
+
+var mainBookURI = "0733Nuwayri.Nihaya";
+var mainBookID = "Shamela0010283";
+var mainBookMilestones = 7995;
+var ms_reuse_fp = "2021.2.5_Shamela0010283_all.csv";
+var stats_fp = "2021.2.5_Shamela0010283_stats.csv";
+
+
+/* General function to create range sliders to filter a graph
+
+Arguments:
+    parentDivID (str): ID of the div in which ihe slider should be placed
+    sliderName (str): name of the slider, which will be used in the IDS of
+      the different components (<sliderName>-container, <sliderName>-slider, ...)
+    minVal (int): minimum value to be displayed on the slider
+    maxVal (int): maximum value to be displayed on the slider
+    startMinVal (int): initial lower value of the range
+    startMaxVal (int): initial upper value of the range
+    updateFunction (func): function used to update the grqph
+    plotObj (graph object): graph to be updated
+    ms_reuse (array): reuse data
+*/
+
+/*
+function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal, updateFunction, plotObj, ms_reuse){
+  let parentDiv = document.getElementById(parentDivID);
+
+  // create a container for the slider:
+  let componentContainer = document.createElement("div");
+  componentContainer.setAttribute("class", "slider-container");
+  componentContainer.setAttribute("id", sliderName+"-container");
+  parentDiv.appendChild(componentContainer);
+
+  // create the slider's label:
+  let label =  document.createElement("p");
+  label.innerText = labelText;
+  componentContainer.appendChild(label);
+
+  // create the slider itself:
+  let slider =  document.createElement("div");
+  slider.setAttribute("id", sliderName+"-slider");
+  slider.setAttribute("class", "slider");
+  componentContainer.appendChild(slider);
+  noUiSlider.create(slider, {
+      start: [startMinVal, startMaxVal],
+      connect: true,
+      range: {
+          'min': minVal,
+          'max': maxVal
+      },
+      step: 1
+  });
+
+  // create the input box for the lower end of the range:
+  let minInput = document.createElement("input");
+  minInput.setAttribute("type", "text");
+  minInput.setAttribute("class", "slider-input-min");
+  minInput.classList.add("slider-input");
+  minInput.setAttribute("id", sliderName+"-input-min");
+  minInput.setAttribute("value", startMinVal);
+  componentContainer.appendChild(minInput);
+
+  // create the input box for the upper end of the range:
+  let maxInput = document.createElement("input");
+  maxInput.setAttribute("type", "text");
+  maxInput.setAttribute("class", "slider-input-max");
+  maxInput.classList.add("slider-input");
+  maxInput.setAttribute("id", sliderName+"-input-max");
+  maxInput.setAttribute("value", startMaxVal);
+  componentContainer.appendChild(maxInput);
+
+  // add event listeners so the slider updates the inputs and vice versa:
+  slider.noUiSlider.on('update', function (values) {
+    minInput.value = parseInt(values[0]);
+    maxInput.value = parseInt(values[1]);
+    updateFunction(values, ms_reuse, plotObj);
+  });
+  minInput.addEventListener("change", function() {
+    slider.noUiSlider.set([minInput.value, null]);
+  }, false);
+  maxInput.addEventListener("change", function() {
+    slider.noUiSlider.set([null, maxInput.value]);
+  }, false);
+  return [minInput, slider, maxInput];
+}*/
+
+function filter_ch_match(values, ms_reuse, plotObj) {
+  // function called when the ch_match slider is updated
+  console.log("currently, "+ms_reuse.length+" data points are shown");
+  var dataFilter = ms_reuse.filter(function(d) {return d.ch_match >= values[0] && d.ch_match <= values[1]});
+  console.log("After updating, "+dataFilter.length+" data points will be shown");
+  //updatePlot(dataFilter, plotObj);  // this does not work yet
+}
+
+/*function prepareData(ms_reuse, stats) {
+  // convert numeric fields into integers:
+  var maxChMatch = 0;
+  var minChMatch = 2000;
+  for (var i=0; i < ms_reuse.length; i++) {
+    ms_reuse[i]["ms1"] = parseInt(ms_reuse[i]["ms1"]);
+    ms_reuse[i]["b1"] = parseInt(ms_reuse[i]["b1"]);
+    ms_reuse[i]["e1"] = parseInt(ms_reuse[i]["e1"]);
+    ms_reuse[i]["ms2"] = parseInt(ms_reuse[i]["ms2"]);
+    ms_reuse[i]["b2"] = parseInt(ms_reuse[i]["b2"]);
+    ms_reuse[i]["e2"] = parseInt(ms_reuse[i]["e2"]);
+    ms_reuse[i]["ch_match"] = parseInt(ms_reuse[i]["ch_match"]);
+    if (ms_reuse[i]["ch_match"] > maxChMatch) {
+      maxChMatch = ms_reuse[i]["ch_match"];
+    }
+    if (ms_reuse[i]["ch_match"] < minChMatch) {
+      minChMatch = ms_reuse[i]["ch_match"];
+    }
+  }
+  console.log("Max character match: "+maxChMatch);
+
+  // add dummy columns for each Nuwayri milestone:
+  for (var i=0; i <= mainBookMilestones; i++) {
+    ms_reuse.push({"ms1": i, "b1": 0, "e1": maxChMatch, "id2": mainBookID, "ms2": i, "b2": 0, "e2": maxChMatch, "ch_match":maxChMatch});
+  }
+
+  // add Nuwayri stats:
+  stats.push({"id": mainBookID, "book": mainBookURI, "alignments": mainBookMilestones, "ch_match": "0"});
+
+  // sort the stats by book URI:
+  stats.sort((a,b) => (a.book > b.book) ? 1 : ((b.book > a.book) ? -1 : 0))
+
+  // add date and book_index fields, and convert numeric fields into integers:
+  var bookIndexDict = new Object();
+  var bookUriDict = new Object();
+  for (var i=0; i < stats.length; i++) {
+    stats[i]["alignments"] = parseInt(stats[i]["alignments"]);
+    stats[i]["ch_match"] = parseInt(stats[i]["ch_match"]);
+    stats[i]["date"] = parseInt(stats[i]["book"].substring(0,4));
+    stats[i]["bookIndex"] = i;
+    bookIndexDict[stats[i]["id"]] = i;
+    bookUriDict[stats[i]["id"]] = [stats[i]["book"]];
+  }
+  console.log(stats[0]);
+  console.log("Number of books in stats: "+ stats.length);
+
+  // add bookIndex + chMatchClass to the ms_reuse data:
+  for (var i=0; i < ms_reuse.length; i++) {
+    ms_reuse[i]["bookIndex"] = bookIndexDict[ms_reuse[i]["id2"]];
+    ms_reuse[i]["ch_match_class"] = Math.ceil(5 * ms_reuse[i]["ch_match"] / maxChMatch);
+  }
+
+  return [ms_reuse, stats, maxChMatch, minChMatch, bookIndexDict, bookUriDict];
+
+}*/
+
+// Define the div for the tooltip in the graph:
+var div = d3.select("#my_dataviz").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+//based on: https://d3-graph-gallery.com/graph/scatter_grouped.html
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 1000 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+//Read the data
+//d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/iris.csv", function(data) {
+d3.csv(ms_reuse_fp, function(ms_reuse_data) {
+  // NB: d3.csv loads csv file as array of objects (like csv.DictReader in Python)
+  d3.csv(stats_fp, function(stats_data) {
+
+    let [ms_reuse, stats, maxChMatch, minChMatch, bookIndexDict, bookUriDict] = prepareData(ms_reuse_data, stats_data);
+
+    // Add X axis
+    var x = d3.scaleLinear()
+      .domain([0, stats.length])  // each book will have its own space on the X axis
+      .range([ 0, width ]);
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+    // Add Y axis
+    var y = d3.scaleLinear()
+      .domain([mainBookMilestones,0])   // filp the axis!
+      .range([ height, 0]);
+    svg.append("g")
+      .call(d3.axisLeft(y));
+
+    // Color scale:
+    var color = d3.scaleOrdinal()
+      .domain([1,2,3,4,5,6])
+      .range([ "#fff596ff", "#ffdc07ff", "#ff8d00ff", "#ff0000ff", "#ae0000ff", "#000000ff"]) // https://www.color-hex.com/color-palette/45851
+      //var color = d3.scaleSequential()
+      //  .domain([1,maxChMatch])
+      //  .interpolator(d3.interpolateInferno);
+
+
+    // Add dots
+    var scatterPlot = svg.append('g')
+    //svg.append('g')
+      .selectAll("dot")
+      .data(ms_reuse)
+      .enter()
+      .append("circle")
+        //.attr("cx", function (d) { return x(d.Sepal_Length); } )
+        //.attr("cy", function (d) { return y(d.Petal_Length); } )
+        //.attr("r", 5)
+        //.style("fill", function (d) { return color(d.Species) } )
+        .attr("cx", function (d) { return x(d.bookIndex); } )
+        .attr("cy", function (d) { return y(d.ms1); } )
+        .attr("r", 1)
+        .style("fill", function (d) { return color(d.ch_match) } )
+        // add tooltip:
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div.html("Milestone in main book: "+ d.ms1 +"<br/>Book 2: "+bookUriDict[d.id2] + "<br/>Milestone in book 2: "+d.ms2 + "<br/>Character match: "+d.ch_match)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+     // Add line symbolizing Nuwayri's text:
+
+     function updatePlot(filteredData, scatterPlot) {
+       console.log("updating plot");
+       scatterPlot.selectAll("dot")
+         .data(filteredData)
+         .join("dot")
+           .attr("cx", function (d) { return x(d.bookIndex); } )
+           .attr("cy", function (d) { return y(d.ms1); } )
+           .attr("r", 1)
+           .style("fill", function (d) { return color(d.ch_match) } )
+           // add tooltip:
+           .on("mouseover", function(d) {
+               div.transition()
+                   .duration(200)
+                   .style("opacity", .9);
+               div.html("Milestone in main book: "+ d.ms1 +"<br/>Book 2: "+bookUriDict[d.id2] + "<br/>Milestone in book 2: "+d.ms2 + "<br/>Character match: "+d.ch_match)
+                   .style("left", (d3.event.pageX) + "px")
+                   .style("top", (d3.event.pageY - 28) + "px");
+               })
+           .on("mouseout", function(d) {
+               div.transition()
+                   .duration(500)
+                   .style("opacity", 0);
+           });
+      console.log("Plot updated (?)");
+    }
+
+
+     // ch_match slider:
+
+      let labelText = "Number of characters matched in milestone:";
+      let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("myFilters", "ch_match", labelText, minChMatch, maxChMatch, minChMatch, maxChMatch, filter_ch_match, scatterPlot, ms_reuse);
+      console.log(ch_match_minInput.value);
+
+      //
+
+  })
+})
+
+</script>

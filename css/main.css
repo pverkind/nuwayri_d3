@@ -1,0 +1,57 @@
+body { font: 12px Arial;}
+
+div.tooltip {
+    position: absolute;
+    //text-align: center;
+    //width: 500px;
+    //height: 100px;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: black;
+    color: grey;
+    border: 0px;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+rect.overlay {
+	stroke: black;
+}
+rect.selection {
+	stroke: none;
+  fill: steelblue;
+  fill-opacity: 0.6;
+}
+
+
+/*SLIDER*/
+.slider-container {
+    height:50px;
+    width: 200px;
+    padding: 20px;
+}
+.slider-input {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  width: 3em;
+  border-radius: 4px;
+  border: 1px solid #D3D3D3;
+}
+.slider-input-max {
+  float: right;
+}
+.slider {
+  height: 10px;
+}
+/* rounded, smaller, slider: see https://refreshless.com/nouislider/examples/#section-styling*/
+.slider .noUi-handle::before,
+.slider .noUi-handle::after {
+    display: none;  /*remove the decorative vertical lines on the slider handles */
+}
+.slider .noUi-handle {
+  height: 18px;
+  width: 18px;
+  top: -5px;
+  right: -9px; /* half the width */
+  border-radius: 9px;
+}
