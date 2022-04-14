@@ -16,6 +16,9 @@
 <!-- Load d3 color scales -->
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
+<!-- Load d3 color legend -->
+<script src="https://api.observablehq.com/@d3/color-legend.js?v=3"></script>
+
 
 <!-- load noUiSlider, see  https://refreshless.com/nouislider -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.js" integrity="sha512-T5Bneq9hePRO8JR0S/0lQ7gdW+ceLThvC80UjwkMRz+8q+4DARVZ4dqKoyENC7FcYresjfJ6ubaOgIE35irf4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -81,24 +84,48 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
     let [ms_reuse, stats, maxChMatch, minChMatch, minDate, maxDate, bookIndexDict, bookUriDict] = prepareData(ms_reuse_data, stats_data);
 
     // Add X axis
-    var x = d3.scaleLinear()
+    var xAxis = d3.scaleLinear()
       .domain([0, stats.length])  // each book will have its own space on the X axis
       .range([ 0, width ]);
     svg.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(xAxis).tickFormat((d) => '').tickSize(0));  // remove tick marks in D3 v4: see https://stackoverflow.com/a/12994876/4045481
+
+    // Add X axis label:  see https://stackoverflow.com/a/11194968/4045481
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", width)
+        .attr("y", height + 20)
+        .text("Books for which passim detected text reuse with "+mainBookURI+" (chronologically arranged)");
 
     // Add Y axis
-    var y = d3.scaleLinear()
+    var yAxis = d3.scaleLinear()
       .domain([mainBookMilestones,0])   // filp the axis!
       .range([ height, 0]);
     svg.append("g")
-      .call(d3.axisLeft(y));
+      .call(d3.axisLeft(yAxis));
+
+    // Add Y axis label:
+    svg.append("text")
+      .attr("class", "y label")
+      .attr("text-anchor", "end")
+      .attr("y", 6)
+      .attr("dy", "-4em")
+      .attr("transform", "rotate(-90)")
+      .text("Milestones in "+mainBookURI);
 
     // Color scale:
     var color = d3.scaleOrdinal()
       .domain([1,2,3,4,5,6])
-      .range([ "#fff596ff", "#ffdc07ff", "#ff8d00ff", "#ff0000ff", "#ae0000ff", "#000000ff"]) // https://www.color-hex.com/color-palette/45851
+      .range([       // https://www.color-hex.com/color-palette/45851
+        "#fff596ff", // light yellow
+        "#ffdc07ff", // dark yellow
+        "#ff8d00ff", // orange
+        "#ff0000ff", // bright red
+        "#ae0000ff", // dark red
+        "#000000ff"  // black
+      ])
       //var color = d3.scaleSequential()
       //  .domain([1,maxChMatch])
       //  .interpolator(d3.interpolateInferno);
@@ -115,8 +142,8 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
         //.attr("cy", function (d) { return y(d.Petal_Length); } )
         //.attr("r", 5)
         //.style("fill", function (d) { return color(d.Species) } )
-        .attr("cx", function (d) { return x(d.bookIndex); } )
-        .attr("cy", function (d) { return y(d.ms1); } )
+        .attr("cx", function (d) { return xAxis(d.bookIndex); } )
+        .attr("cy", function (d) { return yAxis(d.ms1); } )
         .attr("r", 1)
         .style("fill", function (d) { return color(d.ch_match) } )
         // add tooltip:
@@ -133,6 +160,23 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
                 .duration(500)
                 .style("opacity", 0);
         });
+
+    /*
+    // NB: zoom seems to need too many resources...
+    //https://bl.ocks.org/puzzler10/91a6b53d4237c97752d0e466443dad0b
+    //create zoom handler
+    var zoom_handler = d3.zoom()
+        .on("zoom", zoom_actions);
+
+    //specify what to do when zoom event listener is triggered
+    function zoom_actions(){
+     scatterPlot.attr("transform", d3.event.transform);
+    }
+
+    //add zoom behaviour to the svg element
+    //same as svg.call(zoom_handler);
+    zoom_handler(svg);
+    */
 
      // Add line symbolizing Nuwayri's text:
 
