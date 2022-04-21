@@ -3,6 +3,8 @@
 This is a first attempt to build an html version of the Nuwayrī app, based
 on the light one-to-all text reuse data csv files.
 
+You can view it online here: https://pverkind.github.io/nuwayri_d3/
+
 It uses D3 to build the visualizations.
 
 As its input, it uses two tsv files, generated from all csv files related to book 1 + the metadata:
