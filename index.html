@@ -1,24 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
-<!--
-<link
-  rel="stylesheet"
-  href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-  crossorigin="anonymous"
-/>-->
 
 <!-- Load d3.js-->
 <!-- <script src="https://d3js.org/d3.v4.js"></script> -->
 <script src="js/libs/d3.v4.js"></script>
-<!--<script src="https://d3js.org/d3.v7.min.js"></script>-->
 
-<!-- Load d3 color scales -->
-<!-- <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script> -->
-<script src="js/libs/d3-scale-chromatic.v1.min.js"></script>
-<!-- Load d3 color legend
-<script src="https://api.observablehq.com/@d3/color-legend.js?v=3"></script> -->
 <!-- Load d3-legend
 <script src="https://cdnjs.com/libraries/d3-legend"></script>-->
 <script src="js/libs/d3-legend.min.js"></script>
@@ -44,10 +31,11 @@
 
 <body>
   <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
+  <!-- Create a div where the graph(s) will live -->
+  <div id="legend"></div>
+  <div id="viz"></div>
   <!-- Create a div where the filters will live -->
   <div id="filters"></div>
-  <!-- Create a div where the graph(s) will live -->
-  <div id="viz"></div>
 
   <div id="eventhandle-div"></div> <!--https://observablehq.com/@sarah37/snapping-range-slider-with-d3-brush-->
 </body>
@@ -55,16 +43,6 @@
 <script>
 
 const dataBasePath = "data/"
-
-/*var mainBookURI = "0733Nuwayri.Nihaya";
-var mainVersionID = "Shamela0010283";
-var mainBookMilestones = 7995;
-//var ms_reuse_fp = "data/2021.2.5_Shamela0010283_all.csv";
-//var stats_fp = "data/2021.2.5_Shamela0010283_stats.csv";
-var OpenITIVersion = "2021.2.5"
-var ms_reuse_fp = "data/"+OpenITIVersion+"_"+mainVersionID+"_all.csv";
-var stats_fp = "data/"+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
-*/
 
 let OpenITIVersion = "2021.2.5"
 //let mainVersionID = "Shamela0010283";  // Nuwayri
@@ -102,7 +80,6 @@ var scatterSvg = d3.select("#viz")
           "translate(" + margin.left + "," + margin.top + ")");
 
 //Read the data
-//d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/iris.csv", function(data) {
 d3.csv(ms_reuse_fp, function(ms_reuse_data) {
   // NB: d3.csv loads csv file as array of objects (like csv.DictReader in Python)
   d3.csv(stats_fp, function(stats_data) {
@@ -110,8 +87,6 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
     // format the milestone reuse data:
     let ms_reuse = prepareMsData(ms_reuse_data);
     let [minChMatch, maxChMatch] = d3.extent(ms_reuse, d => d.ch_match);
-    console.log("maxChMatch: "+maxChMatch);
-    console.log(d3.max(ms_reuse, d => d.ms1));
 
     // add dummy columns for each milestone in the main book,
     //so that each milestone in the main book is displayed as a black dot in the graph:
@@ -120,7 +95,7 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
       ms_reuse.push({"ms1": i, "b1": 0, "e1": maxChMatch, "id2": mainVersionID, "ms2": i, "b2": 0, "e2": maxChMatch, "ch_match": maxChMatch, "id": last_i + i + 1});
     }
 
-    // add main book stats:
+    // add stats of the main book to the stats_data array:
     stats_data.push({"id": mainVersionID, "book": mainBookURI, "alignments": mainBookMilestones, "ch_match": "0"});
 
     // format the book statistics data and create dictionaries
@@ -131,45 +106,18 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
     // calculate some useful values based on the book metadata:
     let [minDate, maxDate] = d3.extent(stats, d => d.date);
     var dotSize = Math.min(Math.ceil(width/stats.length/2), Math.ceil(height/mainBookMilestones/2));
-    console.log("dotSize: ", dotSize);
 
-    // add bookIndex + chMatchClass to the ms_reuse data:
+    // add bookIndex + date to the ms_reuse data:
     for (var i=0; i < ms_reuse.length; i++) {
       ms_reuse[i]["bookIndex"] = bookIndexDict[ms_reuse[i]["id2"]];
-      ms_reuse[i]["ch_match_class"] = Math.ceil(6 * ms_reuse[i]["ch_match"] / maxChMatch);
+      //ms_reuse[i]["ch_match_class"] = Math.ceil(6 * ms_reuse[i]["ch_match"] / maxChMatch);
       ms_reuse[i]["date"] = parseInt(bookUriDict[ms_reuse[i]["id2"]][0].substring(0, 4));
     }
 
     // Create color scale:
-    console.log(minChMatch+","+maxChMatch);
-    let colorRange = d3.range(6).map(function(i) {return parseInt((i+1)*maxChMatch/6);})
-    console.log("colorRange: "+colorRange);
-
-    /*var colorScale = d3.scaleOrdinal()
-      //.domain([1,2,3,4,5,6])
-      .domain(colorRange)
-      .range([       // https://www.color-hex.com/color-palette/45851
-        "#fff596ff", // light yellow
-        "#ffdc07ff", // dark yellow
-        "#ff8d00ff", // orange
-        "#ff0000ff", // bright red
-        "#ae0000ff", // dark red
-        "#000000ff"  // black
-      ])
-      console.log("colorScale(1000): "+colorScale(3));*/
       var colorScale = d3.scaleSequential()
         .domain([maxChMatch, minChMatch])
         .interpolator(d3.interpolateInferno);
-      /*var colorScale = d3.scaleQuantize()
-        .domain(colorRange)
-        .range([       // https://www.color-hex.com/color-palette/45851
-          "#fff596ff", // light yellow
-          "#ffdc07ff", // dark yellow
-          "#ff8d00ff", // orange
-          "#ff0000ff", // bright red
-          "#ae0000ff", // dark red
-          "#000000ff"  // black
-        ]);*/
 
     // create X and Y scaling functions:
     var xScale = d3.scaleLinear()
@@ -209,17 +157,14 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
       .attr("transform", "rotate(-90)")
       .text("Milestones in "+mainBookURI);
 
-
-    // Create scatter plot
+    // Create scatter plot <g> object
     var scatterPlot = scatterSvg.append('g')
     //scatterSvg.append('g')
       .attr("class", "scatter-plot");
 
     // Add data to the plot:
     const updateScatter = (incomingData, scatterPlot) => {
-      console.log("UPDATING GRAPH!");
-      console.log(incomingData.length);
-      // Add data to scatterPlot:
+      console.log("Updating scatter plot with "+incomingData.length+" data points.");
       scatterPlot
         // select all <circle> tag in the scatterPlot
         .selectAll("circle")
@@ -238,7 +183,7 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
           .exit()
             .remove();
 
-      // re-attach the data to the remaining circles:
+      // re-distribute the data to the remaining circles:
       scatterPlot
         .selectAll("circle")
         .data(incomingData)
@@ -246,14 +191,17 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
         .attr("cx", function (d) { return xScale(d.bookIndex); } )
         .attr("cy", function (d) { return yScale(d.ms1); } )
         .attr("r", dotSize)
-        //.style("fill", function (d) { return colorScale(d.ch_match_class) } )
         .style("fill", function (d) { return colorScale(d.ch_match) } )
         // add tooltip:
         .on("mouseover", function(d) {
             div.transition()
                 .duration(200)
                 .style("opacity", .9);
-            div.html("Milestone in main book: "+ d.ms1 +"<br/>Book 2: "+bookUriDict[d.id2] + "<br/>Milestone in book 2: "+d.ms2 + "<br/>Character match: "+d.ch_match + "<br/>Book index: "+d.bookIndex)
+            let tooltipMsg = "Milestone in main book: " + d.ms1;
+            tooltipMsg += "<br/>Book 2: " + bookUriDict[d.id2];
+            tooltipMsg += "<br/>Milestone in book 2: " + d.ms2;
+            tooltipMsg += "<br/>Character match: " + d.ch_match;
+            div.html(tooltipMsg)
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
             })
@@ -265,21 +213,24 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
 
     }
 
+    // populate the scatter plot:
     updateScatter(ms_reuse, scatterPlot);
 
     // add a color legend:
-    var legendSvg = d3.select("#viz")
+    var legendSvg = d3.select("#legend")
       .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", 100);
+        .attr("height", 75);
     legendSvg.append("g")
       .attr("class", "legendSequential")
-      .attr("transform", "translate(20,20)");
+      .attr("transform", "translate(80,20)");
 
      var legend = d3.legendColor()
+       .title("Number of characters reused in the milestone:")
        .labelFormat(".0f")
+       .labelAlign("start")
        .cells(10)
-       .shapeWidth(30)
+       .shapeWidth(40)
        .orient('horizontal')
        .scale(colorScale)
        .ascending(true);
@@ -293,56 +244,15 @@ d3.csv(ms_reuse_fp, function(ms_reuse_data) {
     */
 
 
-    /*
-    //https://bl.ocks.org/puzzler10/91a6b53d4237c97752d0e466443dad0b
-    // NB: zoom seems to need too many resources...
-    // solution: .on("zoomend", zoom_actions) ?? only zoom when user stops zooming?
-    //create zoom handler
-    var zoom_handler = d3.zoom()
-        //.on("zoom", zoom_actions);
-        .on("zoom", zoom_actions);
-
-    //specify what to do when zoom event listener is triggered
-    function zoom_actions(){
-     scatterPlot.attr("transform", d3.event.transform);
-    }
-
-    //add zoom behaviour to the svg element
-    //same as svg.call(zoom_handler);
-    zoom_handler(svg);
-    */
-
-    /*
-    //https://bl.ocks.org/evanjmg/7c43c37b1f7752a1ff438109f655bed3
-    var zoom = d3.zoom()
-      .scaleExtent([0.5, 5])
-      .translateExtent([
-         [-width * 2, -height * 2],
-         [width * 2, height * 2]
-      ])
-      .on("zoom", zoomed);
-
-    function zoomed() {
-      currentTransform = d3.event.transform;
-      scatterPlot.attr("transform", currentTransform);
-      gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
-      gY.call(yScale.scale(d3.event.transform.rescaleY(yScale)));
-      console.log("zooming");
-    }
-    svg.call(zoom);
-    */
-
-
-     // ch_match slider:
+     // build slider for the number of characters matched:
 
       let labelText = "Number of characters matched in milestone:";
       let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("filters", "ch_match", labelText, minChMatch, maxChMatch, minChMatch, maxChMatch, filter_ch_match, updateScatter, scatterPlot, ms_reuse);
 
-      // date slider:
+      // build slider for the date of book 2:
 
        labelText = "Date of book 2:";
        let [date_minInput, date_slider, date_maxInput] = createSlider("filters", "date", labelText, minDate, maxDate, minDate, maxDate, filter_date, updateScatter, scatterPlot, ms_reuse);
-       //console.log(ch_match_minInput.value);
 
   })
 })
