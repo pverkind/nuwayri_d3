@@ -5,6 +5,24 @@ on the light one-to-all text reuse data csv files.
 
 It uses D3 to build the visualizations.
 
+As its input, it uses two tsv files, generated from all csv files related to book 1 + the metadata:
+* VERSION_BOOK1ID_all.csv: contains reuse data for all alignments involving book 1. Columns: 
+   - ms1: milestone number in book 1
+   - b1: character offset of the start of the alignment in ms1
+   - e1: character offset of the end of the alignment in ms1
+   - id2: version ID of book 2
+   - ms2: milestone number in book 2
+   - b2: character offset of the start of the alignment in ms2
+   - e2: character offset of the end of the alignment in ms2
+   - ch_match: number of characters matched
+* VERSION_BOOK1ID_stats.csv: contains metadata and summary statistics of all books that have alignments with book 1. Columns: 
+  - id: version ID of book 2
+  - book: book URI of book 2
+  - alignments: total number of alignments between book 1 and book 2
+  - ch_match: total number of characters matched between book 1 and book 2
+
+
+
 To run the app: use a local server like atom-live-server in Atom, or Python's SimpleHTTPServer.
 
 A start has been made to compartmentalize the code:
@@ -25,15 +43,8 @@ BUT: the main js code is still in the html file!
 
 * put the main js code in a separate file
 * Scatter plot:
-  - remove X axis ticks and tick labels
-  - add axis labels
-  - add color legend
   - add zooming in/out function
-  - find out why the Nuwayri line is yellow instead of black
 * Sliders:
-  - make the sliders filter the graph
-  - the sliders call the updatePlot function twice already when they are created!
-  - format the sliders: smaller + next to each other?
   - add sliders for
     * Nuwayrī milestone number
     * total number of alignments in common with Nuwayrī
