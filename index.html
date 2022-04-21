@@ -23,6 +23,9 @@
 <script src="js/sliderCreation.js"></script>
 <!--<script src="js/updateCharts.js"></script>-->
 <script src="js/filterFunctions.js"></script>
+<script src="js/buildScatter.js"></script>
+<script src="js/buildLegends.js"></script>
+<script src="js/buildBar.js"></script>
 <script src="js/main.js"></script>
 
 
@@ -30,16 +33,17 @@
 </head>
 
 <body>
+  <div>
+    <button onclick="loadNuwayri()">Load Nuwayri</button>
+    <button onclick="loadIstakhri()">Load Istakhri</button>
+  </div>
   <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
   <!-- Create a div where the graph(s) will live -->
   <div id="legend"></div>
   <div id="viz"></div>
+  <div id="viz2"></div>
   <!-- Create a div where the filters will live -->
   <div id="filters"></div>
-  <div style="margin:20px;">
-    <button onclick="loadNuwayri()">Load Nuwayri</button>
-    <button onclick="loadIstakhri()">Load Istakhri</button>
-  </div>
   <div id="eventhandle-div"></div> <!--https://observablehq.com/@sarah37/snapping-range-slider-with-d3-brush-->
 </body>
 
@@ -55,16 +59,22 @@ let mainVersionID = "Shamela0011680";  // Istakhri
 main(dataBasePath, OpenITIVersion, mainVersionID);*/
 
 function loadNuwayri(){
+  // remove earlier content:
   document.getElementById("viz").replaceChildren();
+  document.getElementById("viz2").replaceChildren();
   document.getElementById("legend").replaceChildren();
   document.getElementById("filters").replaceChildren();
+  // load new data:
   let mainVersionID = "Shamela0010283";  // Nuwayri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 function loadIstakhri(){
+  // remove earlier content:
   document.getElementById("viz").replaceChildren();
+  document.getElementById("viz2").replaceChildren();
   document.getElementById("legend").replaceChildren();
   document.getElementById("filters").replaceChildren();
+  // load new data:
   let mainVersionID = "Shamela0011680";  // Nuwayri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
