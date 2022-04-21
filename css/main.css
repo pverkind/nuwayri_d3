@@ -55,3 +55,8 @@ rect.selection {
   right: -9px; /* half the width */
   border-radius: 9px;
 }
+
+/**/
+.slider-container {
+  display: inline-block;
+}

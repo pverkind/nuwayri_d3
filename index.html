@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+<!--
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+  integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+  crossorigin="anonymous"
+/>-->
+
+<!-- Load d3.js-->
+<!-- <script src="https://d3js.org/d3.v4.js"></script> -->
+<script src="js/libs/d3.v4.js"></script>
+<!--<script src="https://d3js.org/d3.v7.min.js"></script>-->
+
+<!-- Load d3 color scales -->
+<!-- <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script> -->
+<script src="js/libs/d3-scale-chromatic.v1.min.js"></script>
+<!-- Load d3 color legend
+<script src="https://api.observablehq.com/@d3/color-legend.js?v=3"></script> -->
+<!-- Load d3-legend
+<script src="https://cdnjs.com/libraries/d3-legend"></script>-->
+<script src="js/libs/d3-legend.min.js"></script>
+
+<!-- load noUiSlider, see  https://refreshless.com/nouislider -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.min.js" integrity="sha512-T5Bneq9hePRO8JR0S/0lQ7gdW+ceLThvC80UjwkMRz+8q+4DARVZ4dqKoyENC7FcYresjfJ6ubaOgIE35irf4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.1/nouislider.css" integrity="sha512-MKxcSu/LDtbIYHBNAWUQwfB3iVoG9xeMCm32QV5hZ/9lFaQZJVaXfz9aFa0IZExWzCpm7OWvp9zq9gVip/nLMg==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+<script src="js/libs/nouislider.v15.5.1.min.js"></script>
+<link rel="stylesheet" href="css/nouislider.v15.5.1.css"/>
+
+<!--Load components: -->
+<script src="js/urlParser.js"></script>
+<script src="js/apiCalls.js"></script>
+<script src="js/dataPreparation.js"></script>
+<script src="js/sliderCreation.js"></script>
+<!--<script src="js/updateCharts.js"></script>-->
+<script src="js/filterFunctions.js"></script>
+<!--<script src="js/main.js"></script>-->
+
+
+<link rel="stylesheet" href="css/main.css"/>
+</head>
+
+<body>
+  <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
+  <!-- Create a div where the filters will live -->
+  <div id="filters"></div>
+  <!-- Create a div where the graph(s) will live -->
+  <div id="viz"></div>
+
+  <div id="eventhandle-div"></div> <!--https://observablehq.com/@sarah37/snapping-range-slider-with-d3-brush-->
+</body>
+
+<script>
+
+const dataBasePath = "data/"
+
+/*var mainBookURI = "0733Nuwayri.Nihaya";
+var mainVersionID = "Shamela0010283";
+var mainBookMilestones = 7995;
+//var ms_reuse_fp = "data/2021.2.5_Shamela0010283_all.csv";
+//var stats_fp = "data/2021.2.5_Shamela0010283_stats.csv";
+var OpenITIVersion = "2021.2.5"
+var ms_reuse_fp = "data/"+OpenITIVersion+"_"+mainVersionID+"_all.csv";
+var stats_fp = "data/"+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
+*/
+
+let OpenITIVersion = "2021.2.5"
+//let mainVersionID = "Shamela0010283";  // Nuwayri
+let mainVersionID = "Shamela0011680";  // Istakhri
+// later, we'll get the mainVersionID and the OpenITIVersion from the URL:
+// let thisUrl = parseUrl();
+let meta = getMeta(mainVersionID);  // this is currently a dummy function; in the final version, this should call the metadata API.
+let mainBookMilestones = meta.lastMilestone;
+let mainBookURI = meta.bookURI;
+let ms_reuse_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_all.csv"; // currently loaded from local data folder, will be loaded from GitHub later
+let stats_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
+
+// Add title:
+d3.select("#pageTitle").html("Text reuse in "+mainBookURI+" for all books in the OpenITI corpus");
+
+// Define the div for the tooltip in the graph:
+var div = d3.select("#viz").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+//based on: https://d3-graph-gallery.com/graph/scatter_grouped.html
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 1000 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+// append the svg object to its container div:
+var scatterSvg = d3.select("#viz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+//Read the data
+//d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/iris.csv", function(data) {
+d3.csv(ms_reuse_fp, function(ms_reuse_data) {
+  // NB: d3.csv loads csv file as array of objects (like csv.DictReader in Python)
+  d3.csv(stats_fp, function(stats_data) {
+
+    // format the milestone reuse data:
+    let ms_reuse = prepareMsData(ms_reuse_data);
+    let [minChMatch, maxChMatch] = d3.extent(ms_reuse, d => d.ch_match);
+    console.log("maxChMatch: "+maxChMatch);
+    console.log(d3.max(ms_reuse, d => d.ms1));
+
+    // add dummy columns for each milestone in the main book,
+    //so that each milestone in the main book is displayed as a black dot in the graph:
+    let last_i = ms_reuse.length-1;
+    for (var i=0; i <= mainBookMilestones; i++) {
+      ms_reuse.push({"ms1": i, "b1": 0, "e1": maxChMatch, "id2": mainVersionID, "ms2": i, "b2": 0, "e2": maxChMatch, "ch_match": maxChMatch, "id": last_i + i + 1});
+    }
+
+    // add main book stats:
+    stats_data.push({"id": mainVersionID, "book": mainBookURI, "alignments": mainBookMilestones, "ch_match": "0"});
+
+    // format the book statistics data and create dictionaries
+    // to look up the x axis position of each book (bookIndexDict)
+    // and the text URI of each version ID (bookUriDict)
+    let [stats, bookIndexDict, bookUriDict] = prepareStats(stats_data);
+
+    // calculate some useful values based on the book metadata:
+    let [minDate, maxDate] = d3.extent(stats, d => d.date);
+    var dotSize = Math.min(Math.ceil(width/stats.length/2), Math.ceil(height/mainBookMilestones/2));
+    console.log("dotSize: ", dotSize);
+
+    // add bookIndex + chMatchClass to the ms_reuse data:
+    for (var i=0; i < ms_reuse.length; i++) {
+      ms_reuse[i]["bookIndex"] = bookIndexDict[ms_reuse[i]["id2"]];
+      ms_reuse[i]["ch_match_class"] = Math.ceil(6 * ms_reuse[i]["ch_match"] / maxChMatch);
+      ms_reuse[i]["date"] = parseInt(bookUriDict[ms_reuse[i]["id2"]][0].substring(0, 4));
+    }
+
+    // Create color scale:
+    console.log(minChMatch+","+maxChMatch);
+    let colorRange = d3.range(6).map(function(i) {return parseInt((i+1)*maxChMatch/6);})
+    console.log("colorRange: "+colorRange);
+
+    /*var colorScale = d3.scaleOrdinal()
+      //.domain([1,2,3,4,5,6])
+      .domain(colorRange)
+      .range([       // https://www.color-hex.com/color-palette/45851
+        "#fff596ff", // light yellow
+        "#ffdc07ff", // dark yellow
+        "#ff8d00ff", // orange
+        "#ff0000ff", // bright red
+        "#ae0000ff", // dark red
+        "#000000ff"  // black
+      ])
+      console.log("colorScale(1000): "+colorScale(3));*/
+      var colorScale = d3.scaleSequential()
+        .domain([maxChMatch, minChMatch])
+        .interpolator(d3.interpolateInferno);
+      /*var colorScale = d3.scaleQuantize()
+        .domain(colorRange)
+        .range([       // https://www.color-hex.com/color-palette/45851
+          "#fff596ff", // light yellow
+          "#ffdc07ff", // dark yellow
+          "#ff8d00ff", // orange
+          "#ff0000ff", // bright red
+          "#ae0000ff", // dark red
+          "#000000ff"  // black
+        ]);*/
+
+    // create X and Y scaling functions:
+    var xScale = d3.scaleLinear()
+      .domain([0, stats.length+2])  // each book will have its own space on the X axis
+      .range([ 0, width ]);
+    var yScale = d3.scaleLinear()
+        .domain([mainBookMilestones,0])   // filp the axis!
+        .range([ height, 0]);
+
+
+    // Add X axis:
+    let xAxisG = scatterSvg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xScale)
+        .tickFormat((d) => '')  // remove tick marks in D3 v4: see https://stackoverflow.com/a/12994876/4045481
+        .tickSize(0)
+      );
+    // Add X axis label:  see https://stackoverflow.com/a/11194968/4045481
+    scatterSvg.append("text")
+    //xAxisG.append("text")
+      .attr("class", "x label")
+      .attr("text-anchor", "end")
+      .attr("x", width)
+      .attr("y", height + 20)
+      .text("Books for which passim detected text reuse with "+mainBookURI+" (chronologically arranged)");
+
+    // Add Y axis
+    let yAxisG = scatterSvg.append("g")
+      .call(d3.axisLeft(yScale));
+    // Add Y axis label:
+    scatterSvg.append("text")
+    //yAxisG.append("text")
+      .attr("class", "y label")
+      .attr("text-anchor", "end")
+      .attr("y", 6)
+      .attr("dy", "-4em")
+      .attr("transform", "rotate(-90)")
+      .text("Milestones in "+mainBookURI);
+
+
+    // Create scatter plot
+    var scatterPlot = scatterSvg.append('g')
+    //scatterSvg.append('g')
+      .attr("class", "scatter-plot");
+
+    // Add data to the plot:
+    const updateScatter = (incomingData, scatterPlot) => {
+      console.log("UPDATING GRAPH!");
+      console.log(incomingData.length);
+      // Add data to scatterPlot:
+      scatterPlot
+        // select all <circle> tag in the scatterPlot
+        .selectAll("circle")
+        // bind the (filtered) milestone reuse data to the selection
+        .data(incomingData)
+        // create a new <circle> tag for the number of data points that are not yet in the graph:
+        .enter()
+          .append("circle");
+
+      // remove superfluous data points:
+      scatterPlot
+        // select all <circle> tag in the scatterPlot
+        .selectAll("circle")
+        // bind the (filtered) milestone reuse data to the selection
+        .data(incomingData)
+          .exit()
+            .remove();
+
+      // re-attach the data to the remaining circles:
+      scatterPlot
+        .selectAll("circle")
+        .data(incomingData)
+        .attr("class", "dot")
+        .attr("cx", function (d) { return xScale(d.bookIndex); } )
+        .attr("cy", function (d) { return yScale(d.ms1); } )
+        .attr("r", dotSize)
+        //.style("fill", function (d) { return colorScale(d.ch_match_class) } )
+        .style("fill", function (d) { return colorScale(d.ch_match) } )
+        // add tooltip:
+        .on("mouseover", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", .9);
+            div.html("Milestone in main book: "+ d.ms1 +"<br/>Book 2: "+bookUriDict[d.id2] + "<br/>Milestone in book 2: "+d.ms2 + "<br/>Character match: "+d.ch_match + "<br/>Book index: "+d.bookIndex)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+            })
+        .on("mouseout", function(d) {
+            div.transition()
+                .duration(200)
+                .style("opacity", 0);
+        });
+
+    }
+
+    updateScatter(ms_reuse, scatterPlot);
+
+    // add a color legend:
+    var legendSvg = d3.select("#viz")
+      .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", 100);
+    legendSvg.append("g")
+      .attr("class", "legendSequential")
+      .attr("transform", "translate(20,20)");
+
+     var legend = d3.legendColor()
+       .labelFormat(".0f")
+       .cells(10)
+       .shapeWidth(30)
+       .orient('horizontal')
+       .scale(colorScale)
+       .ascending(true);
+
+     legendSvg.select(".legendSequential")
+       .call(legend);
+
+    /*var barPlot = scatterSvg.append('g')
+      .attr("class", "bar-plot")
+      .
+    */
+
+
+    /*
+    //https://bl.ocks.org/puzzler10/91a6b53d4237c97752d0e466443dad0b
+    // NB: zoom seems to need too many resources...
+    // solution: .on("zoomend", zoom_actions) ?? only zoom when user stops zooming?
+    //create zoom handler
+    var zoom_handler = d3.zoom()
+        //.on("zoom", zoom_actions);
+        .on("zoom", zoom_actions);
+
+    //specify what to do when zoom event listener is triggered
+    function zoom_actions(){
+     scatterPlot.attr("transform", d3.event.transform);
+    }
+
+    //add zoom behaviour to the svg element
+    //same as svg.call(zoom_handler);
+    zoom_handler(svg);
+    */
+
+    /*
+    //https://bl.ocks.org/evanjmg/7c43c37b1f7752a1ff438109f655bed3
+    var zoom = d3.zoom()
+      .scaleExtent([0.5, 5])
+      .translateExtent([
+         [-width * 2, -height * 2],
+         [width * 2, height * 2]
+      ])
+      .on("zoom", zoomed);
+
+    function zoomed() {
+      currentTransform = d3.event.transform;
+      scatterPlot.attr("transform", currentTransform);
+      gX.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
+      gY.call(yScale.scale(d3.event.transform.rescaleY(yScale)));
+      console.log("zooming");
+    }
+    svg.call(zoom);
+    */
+
+
+     // ch_match slider:
+
+      let labelText = "Number of characters matched in milestone:";
+      let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("filters", "ch_match", labelText, minChMatch, maxChMatch, minChMatch, maxChMatch, filter_ch_match, updateScatter, scatterPlot, ms_reuse);
+
+      // date slider:
+
+       labelText = "Date of book 2:";
+       let [date_minInput, date_slider, date_maxInput] = createSlider("filters", "date", labelText, minDate, maxDate, minDate, maxDate, filter_date, updateScatter, scatterPlot, ms_reuse);
+       //console.log(ch_match_minInput.value);
+
+  })
+})
+
+</script>

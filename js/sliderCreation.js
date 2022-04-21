@@ -8,18 +8,19 @@ Arguments:
     maxVal (int): maximum value to be displayed on the slider
     startMinVal (int): initial lower value of the range
     startMaxVal (int): initial upper value of the range
+    filterFunction (func): function used to filter the data based on the slider values
     updateFunction (func): function used to update the grqph
     plotObj (graph object): graph to be updated
     ms_reuse (array): reuse data
 */
 
-function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal, updateFunction, plotObj, ms_reuse){
+function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal, filterFunction, updateFunction, plotObj, ms_reuse){
   let parentDiv = document.getElementById(parentDivID);
 
   // create a container for the slider:
   let componentContainer = document.createElement("div");
   componentContainer.setAttribute("class", "slider-container");
-  componentContainer.setAttribute("id", sliderName+"-container");
+  componentContainer.setAttribute("id", sliderName+"-slider-container");
   parentDiv.appendChild(componentContainer);
 
   // create the slider's label:
@@ -60,17 +61,25 @@ function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startM
   maxInput.setAttribute("value", startMaxVal);
   componentContainer.appendChild(maxInput);
 
-  // add event listeners so the slider updates the inputs and vice versa:
-  slider.noUiSlider.on('update', function (values) {
+  // add event listeners so the slider updates the inputs
+  // when sliding ends,
+  // and the inputs update the slider when user presses enter in them
+  slider.noUiSlider.on('end', function (values) {
     minInput.value = parseInt(values[0]);
     maxInput.value = parseInt(values[1]);
-    updateFunction(values, ms_reuse, plotObj);
+    filterFunction(values, ms_reuse, updateFunction, plotObj);
   });
-  minInput.addEventListener("change", function() {
-    slider.noUiSlider.set([minInput.value, null]);
+  minInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {  // Enter pressed
+      slider.noUiSlider.set([minInput.value, null]);
+      filterFunction([minInput.value, maxInput.value], ms_reuse, updateFunction, plotObj);
+    }
   }, false);
-  maxInput.addEventListener("change", function() {
-    slider.noUiSlider.set([null, maxInput.value]);
+  maxInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {  // Enter pressed
+      slider.noUiSlider.set([null, maxInput.value]);
+      filterFunction([minInput.value, maxInput.value], ms_reuse, updateFunction, plotObj);
+    }
   }, false);
   return [minInput, slider, maxInput];
 }
