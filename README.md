@@ -27,17 +27,18 @@ To run the app: use a local server like atom-live-server in Atom, or Python's Si
 
 A start has been made to compartmentalize the code:
 
-* js/dataPreparation.js contains the prepareData function that formats the
+* js/main.js contains the main code for creating the graph, filters etc. 
+* js/dataPreparation.js contains the prepareMsData and prepareStats functions that format the
   raw input data (ms_reuse and stats)
-* js/filterFunctions.js will contain a function for each filter (character_match, date, ...);
+* js/filterFunctions.js contains a function for each filter (character_match, date, ...);
   those functions process the input from the sliders, filter the data accordingly,
   and update the graph
 * js/sliderCreation.js contains a constructor function for new sliders; given a name,
   label, minimum and maximum values, and a filter function that should be
   invoked when the slider changes, a new slider is created. Uses the
   noUiSlider, see  https://refreshless.com/nouislider
-
-BUT: the main js code is still in the html file!
+* js/apiCalls.js contains a dummy function emulating a call to the metadata API.
+* js/urlParser.js contains a function to parse the page's URL; this is not functional yet.
 
 ## TO DO:
 
@@ -54,3 +55,4 @@ BUT: the main js code is still in the html file!
 * add a filtered list of book titles?
 * check the Nuwayrī app which elements we would like to transfer to html/d3 version
 * integrate with diff viewer (load diff when clicking a milestone in the graph?)
+* finalize the url parser
