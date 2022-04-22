@@ -72,7 +72,9 @@ function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBoo
 
   // Add Y axis:
   let yAxisG = scatterSvg.append("g")
-    .call(d3.axisLeft(yScale));
+    .call(d3.axisLeft(yScale)
+    .tickSize(2)
+  );
   // Add Y axis label:
   scatterSvg.append("text")
     .attr("class", "y label")

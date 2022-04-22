@@ -8,13 +8,12 @@ Arguments:
     maxVal (int): maximum value to be displayed on the slider
     startMinVal (int): initial lower value of the range
     startMaxVal (int): initial upper value of the range
-    filterFunction (func): function used to filter the data based on the slider values
-    updateFunction (func): function used to update the grqph
-    plotObj (graph object): graph to be updated
-    ms_reuse (array): reuse data
+    filterFunctions (array): array of functions used to filter the data based on the slider values
+    updateFunctions (array): array of function used to update the grqphs
+    datasets (array): array of datasets to be filtered
 */
 
-function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal, filterFunction, updateFunction, plotObj, ms_reuse){
+function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startMinVal, startMaxVal){
   let parentDiv = document.getElementById(parentDivID);
 
   // create a container for the slider:
@@ -61,25 +60,74 @@ function createSlider(parentDivID, sliderName, labelText, minVal, maxVal, startM
   maxInput.setAttribute("value", startMaxVal);
   componentContainer.appendChild(maxInput);
 
+  return [minInput, slider, maxInput];
+}
+
+/* General function to add event listeners to range sliders to filter a graph
+
+Arguments:
+    minInput (): the input field for the minimum value to which an event listener should be attached
+    slider (): the slider to which an event listener should be attached
+    maxInput (): the input field for the maximum value to which an event listener should be attached
+    filterFunctions (array): array of functions used to filter the data based on the slider values
+    updateFunctions (array): array of function used to update the grqphs
+    datasets (array): array of datasets to be filtered
+*/
+
+function addSliderEventListener(minInput, slider, maxInput, filterFunctions, updateFunctions, datasets) {
+  console.log("Adding event listener to slider");
+  console.log(filterFunctions);
   // add event listeners so the slider updates the inputs
   // when sliding ends,
   // and the inputs update the slider when user presses enter in them
   slider.noUiSlider.on('end', function (values) {
     minInput.value = parseInt(values[0]);
     maxInput.value = parseInt(values[1]);
-    filterFunction(values, ms_reuse, updateFunction, plotObj);
+    for (let i=0; i < filterFunctions.length; i++) {
+      console.log(i);
+      filterFunctions[i](values, datasets[i], updateFunctions[i]);
+    }
   });
   minInput.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {  // Enter pressed
       slider.noUiSlider.set([minInput.value, null]);
-      filterFunction([minInput.value, maxInput.value], ms_reuse, updateFunction, plotObj);
+      for (let i=0; i < filterFunctions.length; i++) {
+        console.log(i);
+        filterFunctions[i](values, datasets[i], updateFunctions[i]);
+      }
     }
   }, false);
   maxInput.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {  // Enter pressed
       slider.noUiSlider.set([null, maxInput.value]);
-      filterFunction([minInput.value, maxInput.value], ms_reuse, updateFunction, plotObj);
+      for (let i=0; i < filterFunctions.length; i++) {
+        console.log(i);
+        filterFunctions[i](values, datasets[i], updateFunctions[i]);
+      }
     }
   }, false);
-  return [minInput, slider, maxInput];
+}
+
+function addChMatchSliderEventListener(minInput, slider, maxInput, filter_ch_match, updateScatter, updateBar, ms_data, stats, mainVersionID) {
+  console.log("Adding event listener to ch_match slider");
+  // add event listeners so the slider updates the inputs
+  // when sliding ends,
+  // and the inputs update the slider when user presses enter in them
+  slider.noUiSlider.on('end', function (values) {
+    minInput.value = parseInt(values[0]);
+    maxInput.value = parseInt(values[1]);
+    filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+  });
+  minInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {  // Enter pressed
+      slider.noUiSlider.set([minInput.value, null]);
+      filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+    }
+  }, false);
+  maxInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {  // Enter pressed
+      slider.noUiSlider.set([null, maxInput.value]);
+      filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+    }
+  }, false);
 }

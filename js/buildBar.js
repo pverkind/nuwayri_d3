@@ -41,6 +41,8 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
   let yAxisG = barSvg.append("g")
     .call(d3.axisLeft(yScale)
       .tickFormat(d3.format('.2s'))
+      .ticks(4)
+      .tickSize(2)
   );
   // Add Y axis label:
   barSvg.append("text")
@@ -86,8 +88,8 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
         .attr("y", d => yScale(d.ch_match))
         .attr("x", d => xScale(d.bookIndex) - barWidth/2)
         .attr("height", d => height -  yScale(d.ch_match) )
-        .style("fill", "blue")
-        .style("stroke", "blue")
+        .style("fill", "#3FB8AF")
+        .style("stroke", "#3FB8AF")
         // add tooltip:
         .on("mouseover", function(d) {
           div.transition()
