@@ -33,14 +33,28 @@ function main(dataBasePath, OpenITIVersion, mainVersionID) {
       let [barPlot, updateBar] = buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width);
       updateBar(stats);
 
-     // build slider for the number of characters matched:
+      // build table that will display stats for the updated books in the graph
+      let statsTableBody = buildStatsTable(stats);
+      let statsTableHead = document.getElementById("stats-table-head");
+      let headers = statsTableHead.querySelectorAll("th");
+      /*for (let i=0; i<headers.length; i++) {
+        headers[i].addEventListener("click", function (i) {
+          sortColumn(i);
+        });
+      }*/
+      [].forEach.call(headers, function (header, index) {
+        header.addEventListener('click', function () {
+          sortColumn(index);
+        });
+      });
 
+
+     // build slider for the number of characters matched:
       let labelText = "Number of characters matched in milestone:";
       let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("filters", "ch_match", labelText, minChMatch, maxChMatch, minChMatch, maxChMatch);
       addChMatchSliderEventListener(ch_match_minInput, ch_match_slider, ch_match_maxInput, filter_ch_match,  updateScatter, updateBar, ms_reuse, stats, mainVersionID);
 
       // build slider for the date of book 2:
-
        labelText = "Date of book 2:";
        let [date_minInput, date_slider, date_maxInput] = createSlider("filters", "date", labelText, minDate, maxDate, minDate, maxDate, filter_date, [updateScatter, updateBar], [scatterPlot, barPlot], ms_reuse);
        addSliderEventListener(date_minInput, date_slider, date_maxInput, [filter_date, filter_date], [updateScatter, updateBar], [ms_reuse, stats]);

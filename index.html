@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="css/nouislider.v15.5.1.css"/>
 
 <!--Load components: -->
+<script src="js/utils.js"></script>
 <script src="js/urlParser.js"></script>
 <script src="js/apiCalls.js"></script>
 <script src="js/dataPreparation.js"></script>
@@ -26,6 +27,7 @@
 <script src="js/buildScatter.js"></script>
 <script src="js/buildLegends.js"></script>
 <script src="js/buildBar.js"></script>
+<script src="js/buildTable.js"></script>
 <script src="js/main.js"></script>
 
 
@@ -36,6 +38,7 @@
   <div>
     <button onclick="loadNuwayri()">Load Nuwayri</button>
     <button onclick="loadIstakhri()">Load Istakhri</button>
+    <span>NB: use query string to load another book (currently only Nuwayrī): http://127.0.0.1:60887?id1=Shamela0010283</span>
   </div>
   <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
   <!-- Create a div where the graph(s) will live -->
@@ -44,6 +47,17 @@
   <div id="viz2"></div>
   <!-- Create a div where the filters will live -->
   <div id="filters"></div>
+  <div id="stats-table-div">
+    <table id="stats-table">
+      <thead id="stats-table-head">
+          <th class="sort-col-head">ID</td>
+          <th class="sort-col-head">URI</td>
+          <th class="sort-col-head">Alignments</td>
+          <th class="sort-col-head">Matching characters</td>
+      </thead>
+      <tbody id="stats-table-body"></tbody>
+    </table>
+  </div>
   <div id="eventhandle-div"></div> <!--https://observablehq.com/@sarah37/snapping-range-slider-with-d3-brush-->
 </body>
 
@@ -55,8 +69,9 @@ let OpenITIVersion = "2021.2.5"
 /*//let mainVersionID = "Shamela0010283";  // Nuwayri
 let mainVersionID = "Shamela0011680";  // Istakhri
 // later, we'll get the mainVersionID and the OpenITIVersion from the URL:
-// let thisUrl = parseUrl();
+
 main(dataBasePath, OpenITIVersion, mainVersionID);*/
+
 
 function loadNuwayri(){
   // remove earlier content:
@@ -78,5 +93,21 @@ function loadIstakhri(){
   let mainVersionID = "Shamela0011680";  // Nuwayri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
-loadIstakhri()
+
+
+// try to get the ID of book 1 from the URL;
+let thisUrl = parseUrl();
+console.log(thisUrl);
+if (thisUrl.id1 && !thisUrl.id2) {
+  console.log("LOADING "+thisUrl.id1);
+  let version = "";
+  if (thisUrl.OpenITIVersion.startsWith("v")){
+    version = thisUrl.OpenITIVersion.substr(1,thisUrl.OpenITIVersion.length);
+  } else {
+    version = thisUrl.OpenITIVersion;
+  }
+  main(dataBasePath, version, thisUrl.id1);
+} else {
+  loadIstakhri()
+}
 </script>

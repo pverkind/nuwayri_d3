@@ -6,20 +6,31 @@ const allOpenITIVersions = {
   "v5" : "v2021.2.5"
 };
 
+/*Parse the URL of the current window and return it as an object
+*/
+
 function parseUrl() {
   let thisUrl = new Object();
   let url = window.location;
+  thisUrl.url = url;
+  thisUrl.OpenITIVersion = "v2021.2.5";
   console.log("URL: "+url);
 
   // parse the path and save elements in thisUrl object:
-
+  console.log("url.pathname: "+url.pathname);
+  /*if (url.pathname === "/") {
+    console.log("no pathname!");
+    thisUrl.pathname = null;
+    return thisUrl;
+  }*/
   let pathArray = url.pathname.split('/');  //
   console.log("pathArray: "+pathArray+' ('+pathArray.length+" elements)");
-  if (pathArray.length > 2) {
+  console.log(pathArray);
+  /*if (pathArray.length > 2) {
     // get OpenITI version number:
-    thisUrl.version = pathArray[2];
-    if (!thisUrl.version.startsWith("v202")) {
-      thisUrl.version = allOpenITIVersions[thisUrl.version] ;
+    thisUrl.OpenITIVersion = pathArray[2];
+    if (!thisUrl.OpenITIVersion.startsWith("v202")) {
+      thisUrl.OpenITIVersion = allOpenITIVersions[thisUrl.version] ;
     }
     // get the IDs of book1 and book2:
     var b1_b2 = pathArray[3];
@@ -34,14 +45,14 @@ function parseUrl() {
     thisUrl.version = "v2021.2.5";
     thisUrl.b1 = null;
     thisUrl.b2 = null;
-  }
+  }*/
 
   // parse the query parameters and save them in the thisUrl object:
 
-  let queryString = url.search.toLowerCase();
+  let queryString = url.search; //.toLowerCase();
   let urlParams = new URLSearchParams(queryString);
   thisUrl.urlParams = urlParams;
-  let allParams = ["ms1", "ms2"];
+  let allParams = ["id1", "id2", "ms1", "ms2"];
   for (const p of allParams) {
     if (urlParams.has(p)) {
       thisUrl[p] = urlParams.get(p);
