@@ -23,9 +23,7 @@ As its input, it uses two tsv files, generated from all csv files related to boo
   - alignments: total number of alignments between book 1 and book 2
   - ch_match: total number of characters matched between book 1 and book 2
 
-
-
-To run the app: use a local server like atom-live-server in Atom, or Python's SimpleHTTPServer.
+To run the app: use a local server like atom-live-server in Atom, or Python's `http.server`.
 
 A start has been made to compartmentalize the code:
 
@@ -44,17 +42,15 @@ A start has been made to compartmentalize the code:
 
 ## TO DO:
 
-* put the main js code in a separate file
 * Scatter plot:
-  - add zooming in/out function
+  - add zooming in/out function + make axes responsive to filtering
+  - add section headers
 * Sliders:
   - add sliders for
     * Nuwayrī milestone number
     * total number of alignments in common with Nuwayrī
     * ...
-* add a bar graph at the bottom to show the number of characters
-  in text reuse alignments for each book2.
-* add a filtered list of book titles?
+* make the parent divs resize with the window?
+* filter the list of book titles + let it act as filter for the graph?
 * check the Nuwayrī app which elements we would like to transfer to html/d3 version
 * integrate with diff viewer (load diff when clicking a milestone in the graph?)
-* finalize the url parser
