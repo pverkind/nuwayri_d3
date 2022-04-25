@@ -1,4 +1,4 @@
-function buildScatterLegend(colorScale, width, margin) {
+function buildScatterLegend(width, margin) {
   var legendSvg = d3.select("#legend")
     .append("svg")
       .attr("width", width + margin.left + margin.right)
@@ -11,7 +11,7 @@ function buildScatterLegend(colorScale, width, margin) {
      .cells(10)
      .shapeWidth(40)
      .orient('horizontal')
-     .scale(colorScale)
+     .scale(window.colorScale)
      .ascending(true)
      .title("Number of characters reused in the milestone:")
      .labelFormat(".0f")   // no decimals

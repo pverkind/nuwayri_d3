@@ -53,14 +53,14 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
     .attr("transform", "rotate(-90)")
     .text("Characters reused");
 
-  let barPlot = barSvg.append('g')
+  window.barPlot = barSvg.append('g')
     .attr("class", "bar-plot");
 
   // Bind data to the plot:
-  function updateBar(incomingData) {
+  window.updateBar = (incomingData) => {
     console.log("Updating bar plot with "+incomingData.length+" data points.");
-    let barPlot = d3.select(".bar-plot");
-    barPlot
+    //let barPlot = d3.select(".bar-plot");
+    window.barPlot
       // select all <rect> tag in the barPlot
       .selectAll("rect")
       // bind the (filtered) milestone reuse data to the selection
@@ -70,7 +70,7 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
         .append("rect");
 
     // remove superfluous data points:
-    barPlot
+    window.barPlot
       // select all <circle> tag in the barPlot
       .selectAll("rect")
       // bind the (filtered) milestone reuse data to the selection
@@ -80,7 +80,7 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
 
     // re-distribute the data to the remaining circles:
     let barWidth = width/stats.length;
-    barPlot
+    window.barPlot
       .selectAll("rect")
       .data(incomingData)
         .attr("class", "bar")
@@ -107,6 +107,4 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
               .style("opacity", 0);
       });
   }
-
-  return [barPlot, updateBar];
 }

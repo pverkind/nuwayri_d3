@@ -108,26 +108,26 @@ function addSliderEventListener(minInput, slider, maxInput, filterFunctions, upd
   }, false);
 }
 
-function addChMatchSliderEventListener(minInput, slider, maxInput, filter_ch_match, updateScatter, updateBar, ms_data, stats, mainVersionID) {
+function addChMatchSliderEventListener(filter_ch_match, updateScatter, updateBar) {
   console.log("Adding event listener to ch_match slider");
   // add event listeners so the slider updates the inputs
   // when sliding ends,
   // and the inputs update the slider when user presses enter in them
-  slider.noUiSlider.on('end', function (values) {
-    minInput.value = parseInt(values[0]);
-    maxInput.value = parseInt(values[1]);
-    filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+  window.ch_match_slider.noUiSlider.on('end', function (values) {
+    window.ch_match_minInput.value = parseInt(values[0]);
+    window.ch_match_maxInput.value = parseInt(values[1]);
+    filter_ch_match(values, updateScatter, updateBar);
   });
-  minInput.addEventListener("keyup", function(event) {
+  window.ch_match_minInput.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {  // Enter pressed
-      slider.noUiSlider.set([minInput.value, null]);
-      filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+      window.ch_match_slider.noUiSlider.set([window.ch_match_minInput.value, null]);
+      filter_ch_match(values, updateScatter, updateBar);
     }
   }, false);
-  maxInput.addEventListener("keyup", function(event) {
+  window.ch_match_maxInput.addEventListener("keyup", function(event) {
     if (event.keyCode === 13) {  // Enter pressed
-      slider.noUiSlider.set([null, maxInput.value]);
-      filter_ch_match(values, updateScatter, updateBar, ms_data, stats, mainVersionID);
+      window.ch_match_slider.noUiSlider.set([null, window.ch_match_maxInput.value]);
+      filter_ch_match(values, updateScatter, updateBar);
     }
   }, false);
 }
