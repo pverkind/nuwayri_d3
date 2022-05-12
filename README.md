@@ -84,18 +84,56 @@ the color can in turn be used to look up the datum associated with that color in
 ## Structure of the code:
 
 * index.html: parses the URL, and checks if the query string contains a single version ID;
-if so, it loads the data for that text
+if so, it loads the data for that text from GitHub
 (currently only 2 sample texts: 0346Istakhri.MasalikWaMamalik and 774Nuwayri.NihayatArab.Shamela0010283);
 if not, it loads Istakhri by default. The home page also currently provides buttons to switch
-between Istakhri and Nuwayri for debugging purposes
+between Istakhri and Nuwayri for testing purposes
 * main.js: contains the scaffolding for the page
   - gets the metadata and file paths to the two tsv functions through a getMeta() function that emulates an API call
-  - the data is loaded from tsv files that are currently located in the data/ folder,
-    but should in the future be loaded from GitHub
+  - the data is loaded from GitHub (test data at https://github.com/pverkind/one_to_all_reuse)
   - main.js calls building functions for the scatter plot, bar plot, color legend, table and sliders;
     these functions are grouped in their own js files:
     * buildScatter.js
+      - buildScatterPlot():
+        * builds the svg that contains the axes
+        * builds the canvas that contains the color-coded data
+        * builds the canvas that contains the heatmap scatter plot
+        * loads and reformats the milestone reuse data (window.ms_reuse) + the book-level stats (window.stats),
+          using the prepareMsData() and prepareStats() functions from dataPreparation.js:
+          - window.ms_reuse: an array of objects with the following keys (each representing a text reuse alignment):
+            NB: for each milestone in book 1, an item is added to this array, so that it can be represented in the scatter plot!
+            * ms1 (int): milestone number in book 1
+            * b1 (int): start index of the alignment in ms1
+            * e1 (int): end index of the alignment in ms1
+            * id2 (str): version ID of book 2
+            * ms2 (int): milestone number in book 2
+            * b2 (int): start index of the alignment in ms2
+            * e2 (int): end index of the alignment in ms2
+            * ch_match (int): number of characters matched
+            * id (int): unique ID for each row
+            * bookIndex (int): index number of the book URI in a sorted list of book URIs (used for the position on the X Axis)
+            * date (int): author's death date (for filtering on date)
+          - window.stats: an array of objects with the following keys (each representing reuse statistics on a specific book):
+            * alignments (int): number of alignments in the book
+            * ch_match (int): number of characters in text reuse alignments
+            * bookIndex (int): index number of the book URI in a sorted list of book URIs (used for the position on the X Axis)
+            * date (int): author's death date (for filtering on date)
+            * book (str): book URI
+            * id (str): version ID of the book
+        * builds some ancillary dictionaries:
+          - window.ms_reuse_map: the dictionary that maps unique colors to the milestone reuse data
+          - window.bookIndexDict: key: version URI of book 2, value: bookIndex
+          - window.bookUriDict: key: version URI of book 2, value: book URI of book 2
+        * creates scaling devices for the X and Y axes and the heatmap colors:
+          - window.colorScale: used to map the number of characters matched to heatmap colors
+          - window.xScale: used not only for the scatter plot but also for the bar plot
+          - yScale: not used outside this function
+      - window.updateScatter(): updates the scatter plot on both canvases,
+        calling the drawPoint() function for each data point.
     * buildBar.js
+      - buildBarPlot():
+        * creates X and Y axes (X axis uses window.xScale, created in buildScatterPlot)
+        * updateBar() function: populates the bar plot with
     * buildLegends.js
     * buildTable.js
     * sliderCreation.js

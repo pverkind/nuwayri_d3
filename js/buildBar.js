@@ -57,14 +57,14 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
     .attr("class", "bar-plot");
 
   // Bind data to the plot:
-  window.updateBar = (incomingData) => {
-    console.log("Updating bar plot with "+incomingData.length+" data points.");
+  window.updateBar = (transform) => {
+    console.log("Updating bar plot with "+window.selectedStats.length+" data points.");
     //let barPlot = d3.select(".bar-plot");
     window.barPlot
       // select all <rect> tag in the barPlot
       .selectAll("rect")
       // bind the (filtered) milestone reuse data to the selection
-      .data(incomingData)
+      .data(window.selectedStats)
       // create a new <circle> tag for the number of data points that are not yet in the graph:
       .enter()
         .append("rect");
@@ -74,7 +74,7 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
       // select all <circle> tag in the barPlot
       .selectAll("rect")
       // bind the (filtered) milestone reuse data to the selection
-      .data(incomingData)
+      .data(window.selectedStats)
         .exit()
           .remove();
 
@@ -82,7 +82,7 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
     let barWidth = width/stats.length;
     window.barPlot
       .selectAll("rect")
-      .data(incomingData)
+      .data(window.selectedStats)
         .attr("class", "bar")
         .attr("width", barWidth)
         .attr("y", d => yScale(d.ch_match))

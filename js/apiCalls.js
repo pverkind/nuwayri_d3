@@ -14,3 +14,35 @@ function getMeta(versionID) {
     }
   }
 }
+
+
+const getMilestoneText = async(releaseVersion, versionID, msNo) => {
+  let DEBUG_BASE_URL = "http://127.0.0.1:8000";
+  let PROD_BASE_URL = "";
+  let baseUrl = DEBUG_BASE_URL;
+  let url = `${baseUrl}/${releaseVersion}/${versionID}/ms/${msNo}/`;
+
+  const resp = await fetch(url);
+  const data = await resp.json();
+  return data;
+}
+
+
+
+/*
+const displayMilestoneText = async(divID, releaseVersion, versionID, msNo, start, end)  => {
+  //getMilestoneText(window.OpenITIVersion, versionID, msNo);
+  let DEBUG_BASE_URL = "http://127.0.0.1:8000";
+  let PROD_BASE_URL = "";
+  let baseUrl = DEBUG_BASE_URL;
+  console.log("releaseVersion:"+releaseVersion);
+  let url = `${baseUrl}/${releaseVersion}/${versionID}/ms/${msNo}/`;
+
+  const resp = await fetch(url);
+  const data = await resp.json();
+  console.log(data);
+  d3.select(divID)
+    .html(data["ms_text"].substring(start, end));
+  return data
+}
+*/

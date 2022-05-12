@@ -16,7 +16,7 @@ function filter_ch_match(values, updateScatter, updateBar) {
     }
     updatedTotalMatches[window.selectedData[i].id2] += window.selectedData[i].ch_match;
   }
-  let updatedStats = [];
+  window.selectedStats = [];
   for (let i=0; i<window.stats.length; i++){
     if (window.stats[i].id !== window.mainVersionID){
       if (updatedTotalMatches.hasOwnProperty(window.stats[i].id)) {
@@ -26,14 +26,14 @@ function filter_ch_match(values, updateScatter, updateBar) {
         } else {
           row.ch_match = 0;
         }
-        updatedStats.push(row);
+        window.selectedStats.push(row);
       }
     }
   }
   console.log("number of stats: "+window.stats.length);
-  console.log("number of updated stats: "+updatedStats.length);
+  console.log("number of updated stats: "+window.selectedStats.length);
 
-  updateBar(updatedStats);
+  updateBar(window.latestTransform);
 }
 
 

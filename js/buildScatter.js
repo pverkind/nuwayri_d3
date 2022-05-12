@@ -43,10 +43,15 @@ function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBoo
 
 
   // Define the div for the tooltip in the graph:
-  let div = d3.select("#viz")
+  /*let div = d3.select("#viz")
     .append("div")
       .attr("class", "tooltip")
-      .style("opacity", 0);
+      .style("opacity", 0);*/
+  // Define the div for the diff tooltip in the graph:
+  /*let diffDiv = d3.select("#viz")
+    .append("div")
+      .attr("class", "diff-tooltip")
+      .style("opacity", 0);*/
 
   // format the milestone reuse data:
   window.ms_reuse = prepareMsData(ms_reuse_data);
