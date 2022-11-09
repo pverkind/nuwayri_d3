@@ -38,6 +38,7 @@
   <div>
     <button onclick="loadNuwayri()">Load Nuwayri</button>
     <button onclick="loadIstakhri()">Load Istakhri</button>
+    <button onclick="loadTabari()">Load Tabari</button>
     <span>NB: use query string to load another book (currently only Nuwayrī): http://127.0.0.1:60887?id1=Shamela0010283</span>
   </div>
   <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
@@ -93,7 +94,18 @@ function loadIstakhri(){
   let mainVersionID = "Shamela0011680";  // Nuwayri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
-
+function loadTabari(){
+  // remove earlier content:
+  document.getElementById("viz").replaceChildren();
+  document.getElementById("viz2").replaceChildren();
+  document.getElementById("legend").replaceChildren();
+  document.getElementById("filters").replaceChildren();
+  document.getElementById("stats-table-body").replaceChildren();
+  d3.select(".diff-tooltip").style("opacity", 0);
+  // load new data:
+  let mainVersionID = "Shamela0009783BK1";  // Tabari
+  main(dataBasePath, OpenITIVersion, mainVersionID);
+}
 
 // try to get the ID of book 1 from the URL;
 let thisUrl = parseUrl();
