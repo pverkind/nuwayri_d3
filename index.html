@@ -91,7 +91,7 @@ function loadIstakhri(){
   document.getElementById("legend").replaceChildren();
   document.getElementById("filters").replaceChildren();
   // load new data:
-  let mainVersionID = "Shamela0011680";  // Nuwayri
+  let mainVersionID = "Shamela0011680";  // Istakhri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 function loadTabari(){
@@ -100,8 +100,6 @@ function loadTabari(){
   document.getElementById("viz2").replaceChildren();
   document.getElementById("legend").replaceChildren();
   document.getElementById("filters").replaceChildren();
-  document.getElementById("stats-table-body").replaceChildren();
-  d3.select(".diff-tooltip").style("opacity", 0);
   // load new data:
   let mainVersionID = "Shamela0009783BK1";  // Tabari
   main(dataBasePath, OpenITIVersion, mainVersionID);
