@@ -327,6 +327,11 @@ openiti_version = "2021.2.5"
 srt_folder = r"D:\London\publications\co-authored vol\geographers_srts_2019\0346Istakhri.MasalikWaMamalik"
 outfolder = r"D:\London\OpenITI\visualization\Nuwayri\test"
 start = time.time()
+
+
+srt_folder= r"D:\London\publications\co-authored vol\geographers_srts_2019\0310Tabari.Tarikh"
+outfolder = "."
+
 extract_milestone_data_from_folder(srt_folder, outfolder, openiti_version, meta,
                                    single_json=True, csv_output=True,
                                    verbose=False, indent=0)

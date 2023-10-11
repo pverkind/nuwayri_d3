@@ -40,10 +40,26 @@
     <button onclick="loadIstakhri()">Load Istakhri</button>
     <button onclick="loadTabari()">Load Tabari</button>
     <span>NB: use query string to load another book (currently only Nuwayrī): http://127.0.0.1:60887?id1=Shamela0010283</span>
+    <!--<form id="csvForm" method="post" enctype="multipart/form-data">
+      <label for="file">Alternatively, choose CSV file to upload (does not work yet):</label>
+      <input type="file" id="file" name="file" accept=".csv" />
+      <button>Submit</button>
+    </form>-->
+    <label for="file">Alternatively, choose CSV file to upload:</label>
+    <input type="file" id="file" name="file" onchange="loadCSV()" />
   </div>
+  
   <h1 id="pageTitle">Text reuse in Nuwayrī's Nihāya for all books in the OpenITI corpus</h1>
   <!-- Create a div where the graph(s) will live -->
-  <div id="legend"></div>
+  <div id="legendContainer" style="display: flex">
+    <div id="legend" style="flex: 3"></div>
+    <div id="colorpicker" style="flex: 1">
+        <input type="radio" id="reds" name="color_radio" value="reds" checked>
+        <label for="reds">reds</label>
+        <input type="radio" id="blues" name="color_radio" value="blues">
+        <label for="blues">blues</label>
+    </div>
+  </div>
   <div id="viz"></div>
   <div id="viz2"></div>
   <!-- Create a div where the filters will live -->
@@ -67,43 +83,78 @@
 const dataBasePath = "data/"
 
 let OpenITIVersion = "2021.2.5"
+
+/*const csvForm = document.getElementById('csvForm');
+csvForm.addEventListener('submit', loadCSV);*/
+
+/** @param {Event} event */
+function handleSubmit(event) {
+  // The rest of the logic will go here.
+}
 /*//let mainVersionID = "Shamela0010283";  // Nuwayri
 let mainVersionID = "Shamela0011680";  // Istakhri
 // later, we'll get the mainVersionID and the OpenITIVersion from the URL:
 
 main(dataBasePath, OpenITIVersion, mainVersionID);*/
 
-
-function loadNuwayri(){
-  // remove earlier content:
+function resetGraph(){
   document.getElementById("viz").replaceChildren();
   document.getElementById("viz2").replaceChildren();
   document.getElementById("legend").replaceChildren();
   document.getElementById("filters").replaceChildren();
+}
+
+function loadNuwayri(){
+  // remove earlier content:
+  resetGraph()
   // load new data:
   let mainVersionID = "Shamela0010283";  // Nuwayri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 function loadIstakhri(){
   // remove earlier content:
-  document.getElementById("viz").replaceChildren();
-  document.getElementById("viz2").replaceChildren();
-  document.getElementById("legend").replaceChildren();
-  document.getElementById("filters").replaceChildren();
+  resetGraph()
   // load new data:
   let mainVersionID = "Shamela0011680";  // Istakhri
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 function loadTabari(){
   // remove earlier content:
-  document.getElementById("viz").replaceChildren();
-  document.getElementById("viz2").replaceChildren();
-  document.getElementById("legend").replaceChildren();
-  document.getElementById("filters").replaceChildren();
+  resetGraph()
   // load new data:
   let mainVersionID = "Shamela0009783BK1";  // Tabari
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
+
+function loadCSV(event){
+  // remove earlier content:
+  resetGraph()
+  /*
+  // upload data: see https://www.freecodecamp.org/news/upload-files-with-javascript/
+  const form = event.currentTarget;
+  const formData = new FormData(form);
+  const url = new URL(form.action);
+  const fetchOptions = {
+    method: form.method,
+    body: formData
+  };
+  fetch(url, fetchOptions);
+  
+
+  // prevent the page from being reloaded:
+  event.preventDefault();*/
+  /*// upload data: see https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsText
+  //const [file] = document.querySelector("input[type=file]").files;
+  const fileReader = new FileReader();
+  fileReader.onload = function(event) {
+    console.log(event.target.result);
+  }
+  let file = event.target.files[0];
+  fileReader.readAsText(file);*/
+  let mainVersionID = "UPLOAD";
+  main(dataBasePath, OpenITIVersion, mainVersionID);
+}
+
 
 // try to get the ID of book 1 from the URL;
 let thisUrl = parseUrl();

@@ -1,7 +1,9 @@
-function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin) {
+function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin, colors=d3.interpolateInferno) {
 
   // Define the div for the tooltip in the graph:
-  let div = d3.select("#viz").append("div")
+  let div = d3.select("#viz")
+    .html("")
+    .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
 
@@ -48,7 +50,7 @@ function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBoo
   // Create color scale:
   let colorScale = d3.scaleSequential()
     .domain([maxChMatch, minChMatch])
-    .interpolator(d3.interpolateInferno);
+    .interpolator(colors);
 
   // create X and Y scaling functions:
   let xScale = d3.scaleLinear()

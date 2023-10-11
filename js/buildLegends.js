@@ -1,5 +1,6 @@
 function buildScatterLegend(colorScale, width, margin) {
   var legendSvg = d3.select("#legend")
+    .html("")
     .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", 75);

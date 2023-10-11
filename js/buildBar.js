@@ -1,6 +1,8 @@
 function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
   // Define the div for the tooltip in the graph:
-  let div = d3.select("#viz2").append("div")
+  let div = d3.select("#viz2")
+    .html("")
+    .append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -61,6 +63,7 @@ function buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width) {
     console.log("Updating bar plot with "+incomingData.length+" data points.");
     let barPlot = d3.select(".bar-plot");
     barPlot
+      .html("")
       // select all <rect> tag in the barPlot
       .selectAll("rect")
       // bind the (filtered) milestone reuse data to the selection

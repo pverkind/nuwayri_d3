@@ -1,9 +1,30 @@
 function main(dataBasePath, OpenITIVersion, mainVersionID) {
+  /*document.getElementById("viz").innerHTML="";
+  document.getElementById("viz2").innerHTML="";
+  document.getElementById("legend").innerHTML="";
+  document.getElementById("filters").innerHTML="";*/
+  if (mainVersionID === "UPLOAD") {
+    console.log("UPLOAD!");
+  }
   let meta = getMeta(mainVersionID);  // this is currently a dummy function; in the final version, this should call the metadata API.
+  console.log(meta);
   let mainBookMilestones = meta.lastMilestone;
   let mainBookURI = meta.bookURI;
   let ms_reuse_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_all.csv"; // currently loaded from local data folder, will be loaded from GitHub later
   let stats_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
+
+  // get the desired color range:
+  blueButton = document.getElementById("blues");
+  let colors = blueButton.checked ? d3.interpolateRgb("blue", "lightblue") : d3.interpolateInferno;
+
+  // set the change event for the radio buttons:
+  let radioButtons = document.querySelectorAll('input[name="color_radio"]');
+  for (const radioButton of radioButtons) {
+    radioButton.addEventListener("click", () => {
+
+      main(dataBasePath, OpenITIVersion, mainVersionID);
+    });
+  }
 
   // Add title:
   d3.select("#pageTitle").html("Text reuse in "+mainBookURI+" for all books in the OpenITI corpus");
@@ -21,7 +42,7 @@ function main(dataBasePath, OpenITIVersion, mainVersionID) {
     // NB: d3.csv loads csv file as array of objects (like csv.DictReader in Python)
     d3.csv(stats_fp, function(stats_data) {
       // build the scatter plot
-      let r = buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin);
+      let r = buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin, colors);
       let [ms_reuse, stats, updateScatter, scatterPlot, colorScale, xScale, minChMatch, maxChMatch, minDate, maxDate] = r
       // populate the scatter plot:
       updateScatter(ms_reuse);
@@ -48,7 +69,8 @@ function main(dataBasePath, OpenITIVersion, mainVersionID) {
         });
       });
 
-
+     //d3.select("#filters").html("");
+     document.getElementById("filters").replaceChildren();
      // build slider for the number of characters matched:
       let labelText = "Number of characters matched in milestone:";
       let [ch_match_minInput, ch_match_slider, ch_match_maxInput] = createSlider("filters", "ch_match", labelText, minChMatch, maxChMatch, minChMatch, maxChMatch);
