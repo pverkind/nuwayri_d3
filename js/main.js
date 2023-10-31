@@ -43,7 +43,7 @@ function main(dataBasePath, OpenITIVersion, mainVersionID) {
     d3.csv(stats_fp, function(stats_data) {
       // build the scatter plot
       let r = buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin, colors);
-      let [ms_reuse, stats, updateScatter, scatterPlot, colorScale, xScale, minChMatch, maxChMatch, minDate, maxDate] = r
+      let [ms_reuse, stats, msStats, msBooks, updateScatter, scatterPlot, colorScale, xScale, yScale, minChMatch, maxChMatch, minDate, maxDate] = r
       // populate the scatter plot:
       updateScatter(ms_reuse);
 
@@ -53,6 +53,10 @@ function main(dataBasePath, OpenITIVersion, mainVersionID) {
       // add barplot to show size of text reuse per book:
       let [barPlot, updateBar] = buildBarPlot(ms_reuse, stats, mainBookURI, xScale, width);
       updateBar(stats);
+
+      // add barplot to show size of text reuse per milestone:
+      let [sidebarPlot, updateSidebar] = buildSideBarPlot(msStats, yScale, height, margin, msBooks);
+      updateSidebar(msStats);
 
       // build table that will display stats for the updated books in the graph
       let statsTableBody = buildStatsTable(stats);

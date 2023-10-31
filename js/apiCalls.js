@@ -26,6 +26,18 @@ function getMeta(versionID) {
       "bookURI": "0310Tabari.Tarikh",
       "lastMilestone": 4863
     }
+  } else if (versionID === "Shamela0007798"){
+    return {
+      "versionID": "Shamela0007798",
+      "bookURI": "0310Tabari.JamicBayan",
+      "lastMilestone": 9702
+    }
+  } else if (versionID === "JK008250Vols"){
+    return {
+      "versionID": "JK008250Vols",
+      "bookURI": "0310Tabari.TahdhibAthar",
+      "lastMilestone": 1155
+    }
   } else {
     let apiURL = "https://kitab-metadata-api.azurewebsites.net/version/";
     versionID = versionID.split("-")[0];

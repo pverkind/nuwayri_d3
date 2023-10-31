@@ -58,11 +58,20 @@ def identify_section_endings(headings, last_ms, outfp):
 if __name__ == "__main__":
     fp = r"D:\London\OpenITI\25Y_repos\0750AH\data\0733Nuwayri\0733Nuwayri.NihayatArab\0733Nuwayri.NihayatArab.Shamela0010283-ara1.mARkdown"
     outfp = r"D:\London\OpenITI\visualization\Nuwayri\nuwayri_d3\data\2021.2.5_Shamela0010283_sections.csv"
-    headings, last_ms = section_headings_by_milestone(fp, outfp)
-    identify_section_endings(headings, last_ms, outfp)
+    #headings, last_ms = section_headings_by_milestone(fp, outfp)
+    #identify_section_endings(headings, last_ms, outfp)
     
     fp = r"D:\London\OpenITI\25Y_repos\0350AH\data\0346Istakhri\0346Istakhri.MasalikWaMamalik\0346Istakhri.MasalikWaMamalik.Shamela0011680-ara1.mARkdown"
     outfp = r"D:\London\OpenITI\visualization\Nuwayri\nuwayri_d3\data\2021.2.5_Shamela0011680_sections.csv"
+
+    fp = r"C:\Users\peter\Downloads\0310Tabari.JamicBayan.Shamela0007798-ara1.inProgress"
+    outfp = r"D:\AKU\OpenITI\visualization\Nuwayri\nuwayri_d3\data\2022.2.7_Shamela0007798_sections.csv"
+    
     headings, last_ms = section_headings_by_milestone(fp, outfp)
     identify_section_endings(headings, last_ms, outfp)
+
+    fp = r"C:\Users\peter\Downloads\0310Tabari.TahdhibAthar.JK008250Vols-ara1.mARkdown"
+    outfp = r"D:\AKU\OpenITI\visualization\Nuwayri\nuwayri_d3\data\2022.2.7_JK008250Vols_sections.csv"
     
+    headings, last_ms = section_headings_by_milestone(fp, outfp)
+    identify_section_endings(headings, last_ms, outfp)

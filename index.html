@@ -26,6 +26,7 @@
 <script src="js/filterFunctions.js"></script>
 <script src="js/buildScatter.js"></script>
 <script src="js/buildLegends.js"></script>
+<script src="js/buildSideBar.js"></script>
 <script src="js/buildBar.js"></script>
 <script src="js/buildTable.js"></script>
 <script src="js/main.js"></script>
@@ -38,7 +39,9 @@
   <div>
     <button onclick="loadNuwayri()">Load Nuwayri</button>
     <button onclick="loadIstakhri()">Load Istakhri</button>
-    <button onclick="loadTabari()">Load Tabari</button>
+    <button onclick="loadTarikh()">Load Tarikh</button>
+    <button onclick="loadTahdhib()">Load Tahdhib</button>
+    <button onclick="loadTafsir()">Load Tafsir</button>
     <span>NB: use query string to load another book (currently only Nuwayrī): http://127.0.0.1:60887?id1=Shamela0010283</span>
     <!--<form id="csvForm" method="post" enctype="multipart/form-data">
       <label for="file">Alternatively, choose CSV file to upload (does not work yet):</label>
@@ -60,7 +63,8 @@
         <label for="blues">blues</label>
     </div>
   </div>
-  <div id="viz"></div>
+  <div id="viz" style="float: left;"></div>
+  <div id="viz3" style="float: left; "></div>
   <div id="viz2"></div>
   <!-- Create a div where the filters will live -->
   <div id="filters"></div>
@@ -82,7 +86,7 @@
 
 const dataBasePath = "data/"
 
-let OpenITIVersion = "2021.2.5"
+let OpenITIVersion = "2021.2.5" // "2022.2.7"
 
 /*const csvForm = document.getElementById('csvForm');
 csvForm.addEventListener('submit', loadCSV);*/
@@ -109,6 +113,7 @@ function loadNuwayri(){
   resetGraph()
   // load new data:
   let mainVersionID = "Shamela0010283";  // Nuwayri
+  let OpenITIVersion = "2021.2.5"
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 function loadIstakhri(){
@@ -116,13 +121,33 @@ function loadIstakhri(){
   resetGraph()
   // load new data:
   let mainVersionID = "Shamela0011680";  // Istakhri
+  let OpenITIVersion = "2021.2.5"
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
-function loadTabari(){
+function loadTarikh(){
   // remove earlier content:
   resetGraph()
   // load new data:
-  let mainVersionID = "Shamela0009783BK1";  // Tabari
+  let mainVersionID = "Shamela0009783BK1";  // Tabari Tarikh
+  let OpenITIVersion = "2021.2.5"
+  main(dataBasePath, OpenITIVersion, mainVersionID);
+}
+
+function loadTafsir(){
+  // remove earlier content:
+  resetGraph()
+  // load new data:
+  let mainVersionID = "Shamela0007798";  // Tabari Jāmiʿ Bayān
+  let OpenITIVersion = "2022.2.7"
+  main(dataBasePath, OpenITIVersion, mainVersionID);
+}
+
+function loadTahdhib(){
+  // remove earlier content:
+  resetGraph()
+  // load new data:
+  let mainVersionID = "JK008250Vols";  // Tabari Tahdhīb
+  let OpenITIVersion = "2022.2.7"
   main(dataBasePath, OpenITIVersion, mainVersionID);
 }
 

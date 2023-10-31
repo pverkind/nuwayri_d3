@@ -1,4 +1,7 @@
 function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBookURI, mainVersionID, width, height, margin, colors=d3.interpolateInferno) {
+  // rescale to the height of Tabari's Tafsīr:
+  //height = (mainBookMilestones / 9702) * height;
+
 
   // Define the div for the tooltip in the graph:
   let div = d3.select("#viz")
@@ -18,7 +21,8 @@ function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBoo
             "translate(" + margin.left + "," + margin.top + ")");
 
   // format the milestone reuse data:
-  let ms_reuse = prepareMsData(ms_reuse_data);
+  let [ms_reuse, msStats, msBooks] = prepareMsData(ms_reuse_data);
+  //let ms_reuse = prepareMsData(ms_reuse_data);
   let [minChMatch, maxChMatch] = d3.extent(ms_reuse, d => d.ch_match);
 
   // add dummy columns for each milestone in the main book,
@@ -141,5 +145,5 @@ function buildScatterPlot(ms_reuse_data, stats_data, mainBookMilestones, mainBoo
               .style("opacity", 0);
       });
   }
-  return [ms_reuse, stats, updateScatter, scatterPlot, colorScale, xScale, minChMatch, maxChMatch, minDate, maxDate]
+  return [ms_reuse, stats, msStats, msBooks, updateScatter, scatterPlot, colorScale, xScale, yScale, minChMatch, maxChMatch, minDate, maxDate]
 }

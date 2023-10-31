@@ -316,7 +316,7 @@ def extract_milestone_data_from_folder(folder, outfolder, openiti_version, meta,
 
 
 meta_fp = r"D:\London\OpenITI\visualization\Nuwayri\powerBI\Metadata\OpenITI_metadata_2021-2-5_merged.txt"
-meta = load_metadata(meta_fp)
+#meta = load_metadata(meta_fp)
 
 ##base_url = "http://dev.kitab-project.org/passim01102021"
 ##main_text_id = "Shamela0010283-ara1.mARkdown"
@@ -326,15 +326,28 @@ meta = load_metadata(meta_fp)
 openiti_version = "2021.2.5"
 srt_folder = r"D:\London\publications\co-authored vol\geographers_srts_2019\0346Istakhri.MasalikWaMamalik"
 outfolder = r"D:\London\OpenITI\visualization\Nuwayri\test"
+
 start = time.time()
-
-
 srt_folder= r"D:\London\publications\co-authored vol\geographers_srts_2019\0310Tabari.Tarikh"
 outfolder = "."
 
+
+openiti_version = "2022.2.7"
+meta_fp = r"D:\AKU\OpenITI\metadata\kitab-metadata-automation\releases\OpenITI_metadata_2022-2-7_merged.csv"
+meta = load_metadata(meta_fp)
+
+base_url = "https://dev.kitab-project.org/passim01122022-v7"
+main_text_id = "JK008250Vols-ara1.mARkdown"
+srt_folder = r"D:\AKU\srt\2022.2.7\0310Tabari.TahdhibAthar"
+
+start = time.time()
+#download_srt_files(base_url, main_text_id, srt_folder)
+end = time.time()
+print("Downloading srt data took", end-start, "seconds")
+
+start = time.time()
 extract_milestone_data_from_folder(srt_folder, outfolder, openiti_version, meta,
                                    single_json=True, csv_output=True,
                                    verbose=False, indent=0)
 end = time.time()
-
 print("extracting data took", end-start, "seconds")
