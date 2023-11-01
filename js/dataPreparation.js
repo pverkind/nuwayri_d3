@@ -45,7 +45,6 @@ function prepareStats(stats) {
     let date = parseInt(stats[i]["book"].substring(0,4));
     stats[i]["date"] = date;
   }
-  console.log(stats[0]);
   console.log("Number of books in stats: "+ stats.length);
 
   return [stats, bookIndexDict, bookUriDict];

@@ -1,21 +1,32 @@
-function main(dataBasePath, OpenITIVersion, mainVersionID) {
+async function main(dataBasePath, OpenITIVersion, mainVersionID) {
   /*document.getElementById("viz").innerHTML="";
   document.getElementById("viz2").innerHTML="";
   document.getElementById("legend").innerHTML="";
   document.getElementById("filters").innerHTML="";*/
+  if (OpenITIVersion === "2022.2.7" || OpenITIVersion === "2023.1.8") {
+    dataBasePath = `https://raw.githubusercontent.com/kitab-project-org/one_to_all/v${OpenITIVersion}/`;
+  }
   if (mainVersionID === "UPLOAD") {
     console.log("UPLOAD!");
   }
-  let meta = getMeta(mainVersionID);  // this is currently a dummy function; in the final version, this should call the metadata API.
+  let meta = await getMeta(mainVersionID, OpenITIVersion);  // this is currently a dummy function; in the final version, this should call the metadata API.
   console.log(meta);
   let mainBookMilestones = meta.lastMilestone;
   let mainBookURI = meta.bookURI;
-  let ms_reuse_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_all.csv"; // currently loaded from local data folder, will be loaded from GitHub later
-  let stats_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
+  let ms_reuse_fp, stats_fp;
+  if (OpenITIVersion === "2022.2.7" || OpenITIVersion === "2023.1.8") {
+    ms_reuse_fp = `${dataBasePath}/msdata/${OpenITIVersion}_${mainVersionID}_all.csv`
+    stats_fp = `${dataBasePath}/stats/${OpenITIVersion}_${mainVersionID}_stats.csv`
+  } else {
+    ms_reuse_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_all.csv"; // currently loaded from local data folder, will be loaded from GitHub later
+    stats_fp = dataBasePath+OpenITIVersion+"_"+mainVersionID+"_stats.csv";
+  }
 
   // get the desired color range:
   blueButton = document.getElementById("blues");
-  let colors = blueButton.checked ? d3.interpolateRgb("blue", "lightblue") : d3.interpolateInferno;
+  let colors = blueButton.checked 
+    ? d3.interpolateRgb("blue", "lightblue") 
+    : d3.interpolateInferno;
 
   // set the change event for the radio buttons:
   let radioButtons = document.querySelectorAll('input[name="color_radio"]');

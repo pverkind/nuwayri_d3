@@ -2,57 +2,48 @@ const allOpenITIVersions = {
   "v1": "v2019.1.1",
   "v2": "v2020.1.2",
   "v3": "v2020.2.3",
-  "v4" : "v2021.1.4",
-  "v5" : "v2021.2.5"
+  "v4": "v2021.1.4",
+  "v5": "v2021.2.5",
+  "v6": "v2022.1.6",
+  "v7": "v2022.2.7",
+  "v8": "v2023.1.8"
 };
 
+const defaultOpenITIVersion = "2023.1.8";
+
 /*Parse the URL of the current window and return it as an object
+
+  This is a temporary function; OpenITI version should be passed 
+  as "v=2022.2.7", "v=2023.1.8", etc.
 */
 
 function parseUrl() {
-  let thisUrl = new Object();
+  // parse the path:
   let url = window.location;
-  thisUrl.url = url;
-  thisUrl.OpenITIVersion = "v2021.2.5";
-  console.log("URL: "+url);
-
-  // parse the path and save elements in thisUrl object:
-  console.log("url.pathname: "+url.pathname);
-  /*if (url.pathname === "/") {
-    console.log("no pathname!");
-    thisUrl.pathname = null;
-    return thisUrl;
-  }*/
-  let pathArray = url.pathname.split('/');  //
-  console.log("pathArray: "+pathArray+' ('+pathArray.length+" elements)");
-  console.log(pathArray);
-  /*if (pathArray.length > 2) {
-    // get OpenITI version number:
-    thisUrl.OpenITIVersion = pathArray[2];
-    if (!thisUrl.OpenITIVersion.startsWith("v202")) {
-      thisUrl.OpenITIVersion = allOpenITIVersions[thisUrl.version] ;
-    }
-    // get the IDs of book1 and book2:
-    var b1_b2 = pathArray[3];
-    if (b1_b2 && b1_b2.includes("_")) {
-      thisUrl.b1 = b1_b2[0];
-      thisUrl.b2 = b1_b2[1];
-    } else {
-      thisUrl.b1 = b1_b2;
-      thisUrl.b2 = "all" ;
-    }
-  } else {
-    thisUrl.version = "v2021.2.5";
-    thisUrl.b1 = null;
-    thisUrl.b2 = null;
-  }*/
-
-  // parse the query parameters and save them in the thisUrl object:
-
   let queryString = url.search; //.toLowerCase();
   let urlParams = new URLSearchParams(queryString);
+
+  // get the OpenITI version from the URL or use the default:
+  let OpenITIVersion;
+  if (urlParams.has("v")) {
+    OpenITIVersion = urlParams.get("v");
+  } else {
+    //OpenITIVersion = "2023.1.8";
+    // reload the page with the default OpenITI version in the URL:
+    console.log(url);
+    urlParams.set('v', defaultOpenITIVersion);
+    window.location.search = urlParams;
+  }
+
+  // save elements in thisUrl object:
+  let thisUrl = new Object();
+  thisUrl.url = url;
   thisUrl.urlParams = urlParams;
-  let allParams = ["id1", "id2", "ms1", "ms2"];
+  thisUrl.OpenITIVersion = OpenITIVersion;
+
+  // parse the query parameters and save them in the thisUrl object:
+  
+  let allParams = ["id1", "id2", "ms1", "ms2", "v"];
   for (const p of allParams) {
     if (urlParams.has(p)) {
       thisUrl[p] = urlParams.get(p);
@@ -65,6 +56,9 @@ function parseUrl() {
       console.log("Unknown url parameter in " + url + " : " + p) ;
      }
   }
+
+  console.log(thisUrl);
+
 
  /*
   // check if the URL contains an anchor; split it off and save it into the thisUrl object:
