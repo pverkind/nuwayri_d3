@@ -40,11 +40,11 @@
     <p>Load the visualisation by adding the version ID to the URL: e.g., ?id1=Shamela0011680</p>
     <p>
       Example texts: 
-      <a href="/?id1=Shamela0009783BK1&v=2022.2.7">Ṭabarī's Taʾrīkh</a>,
-      <a href="/?id1=Shamela0007798&v=2022.2.7">Ṭabarī's Tafsir</a>,
-      <a href="/?id1=JK008250Vols&v=2022.2.7">Ṭabarī's Tahdhīb</a>,
-      <a href="/?id1=Shamela0010283&v=2022.2.7">Nuwayrī's Nihāya</a>,
-      <a href="/?id1=Shamela0011680&v=2022.2.7">Iṣṭakhrī's Masālik</a>
+      <a href="?id1=Shamela0009783BK1&v=2022.2.7">Ṭabarī's Taʾrīkh</a>,
+      <a href="?id1=Shamela0007798&v=2022.2.7">Ṭabarī's Tafsir</a>,
+      <a href="?id1=JK008250Vols&v=2022.2.7">Ṭabarī's Tahdhīb</a>,
+      <a href="?id1=Shamela0010283&v=2022.2.7">Nuwayrī's Nihāya</a>,
+      <a href="?id1=Shamela0011680&v=2022.2.7">Iṣṭakhrī's Masālik</a>
     </p>
     <!--<button onclick="loadNuwayri()">Load Nuwayri</button>
     <button onclick="loadIstakhri()">Load Istakhri</button>
@@ -133,7 +133,8 @@ function loadIstakhri(){
   let mainVersionID = "Shamela0011680";  // Istakhri
   let OpenITIVersion = "2022.2.7" //"2021.2.5"
   //main(dataBasePath, OpenITIVersion, mainVersionID);
-  window.location.href = `/?id1=${mainVersionID}&v=${OpenITIVersion}`;
+  //window.location.href = `/?id1=${mainVersionID}&v=${OpenITIVersion}`;
+  window.location.search = `id1=${mainVersionID}&v=${OpenITIVersion}`;
 }
 function loadTarikh(){
   // remove earlier content:
@@ -152,7 +153,7 @@ function loadTafsir(){
   let mainVersionID = "Shamela0007798";  // Tabari Jāmiʿ Bayān
   let OpenITIVersion = "2022.2.7"
   //main(dataBasePath, OpenITIVersion, mainVersionID);
-  window.location.href = `/?id1=${mainVersionID}&v=${OpenITIVersion}`;
+  window.location.search = `/?id1=${mainVersionID}&v=${OpenITIVersion}`;
 }
 
 function loadTahdhib(){
